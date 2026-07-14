@@ -36,8 +36,7 @@ export const Hero = {
     });
 
     function goToBooking() {
-      // TODO: navegação para a tela/rota de busca de barbeiros
-      console.log('Get Started clicado — plugar rota de agendamento aqui');
+      window.location.assign('./agendamento/');
     }
 
     onMounted(() => {

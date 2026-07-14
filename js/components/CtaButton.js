@@ -39,7 +39,7 @@ export const CtaButton = {
       emit('click');
       // Reset ilustrativo — substitua por controle real (ex.: liberar
       // isSubmitting quando a navegação/promise da ação terminar).
-      setTimeout(() => { isSubmitting.value = false; }, 900);
+      setTimeout(() => { isSubmitting.value = false; }, 2000);
     }
 
     return { isSubmitting, handleClick };
