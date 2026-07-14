@@ -2,251 +2,260 @@
 <html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1">
-    <title>Lukiinha Cortes — Agendamento</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1">
+  <title>Lukiinha Cortes — Agendamento</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
 
-    <script src="https://unpkg.com/vue@3.4.31/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/vue@3.4.31/dist/vue.global.prod.js"></script>
 
-    <link rel="stylesheet" href="./css/components/agendamento.css">
+  <link rel="stylesheet" href="./css/components/agendamento.css">
 </head>
 
 <body>
 
-    <div id="app"></div>
+  <div id="app"></div>
 
-    <!-- Component scripts (modularized) -->
-    <script src="./js/components/TypingIndicator.js"></script>
-    <script src="./js/components/ServiceGrid.js"></script>
-    <script src="./js/components/BarberRow.js"></script>
-    <script src="./js/components/CalendarPicker.js"></script>
-    <script src="./js/components/TimeSlots.js"></script>
+  <!-- Component scripts (modularized) -->
+  <script src="./js/components/TypingIndicator.js"></script>
+  <script src="./js/components/ServiceGrid.js"></script>
+  <script src="./js/components/BarberRow.js"></script>
+  <script src="./js/components/CalendarPicker.js"></script>
+  <script src="./js/components/TimeSlots.js"></script>
 
-    <script>
-        const { createApp, ref, reactive, computed, nextTick, onMounted } = Vue;
+  <script>
+    const { createApp, ref, reactive, computed, nextTick, onMounted } = Vue;
 
-        /* ===================== DATA ===================== */
+    /* ===================== DATA ===================== */
 
-        const SERVICES = [
-            { id: 'corte', name: 'Corte', icon: 'ri-scissors-2-line', price: 45, duration: 30 },
-            { id: 'barba', name: 'Barba', icon: 'ri-knife-blood-line', price: 35, duration: 20 },
-            { id: 'combo', name: 'Corte + Barba', icon: 'ri-magic-line', price: 70, duration: 50 },
-            { id: 'sobrancelha', name: 'Sobrancelha', icon: 'ri-focus-3-line', price: 15, duration: 10 },
-        ];
+    const SERVICES = [
+      { id: 'corte', name: 'Corte', icon: 'ri-scissors-2-line', price: 45, duration: 30 },
+      { id: 'barba', name: 'Barba', icon: 'ri-knife-blood-line', price: 35, duration: 20 },
+      { id: 'combo', name: 'Corte + Barba', icon: 'ri-magic-line', price: 70, duration: 50 },
+      { id: 'sobrancelha', name: 'Sobrancelha', icon: 'ri-focus-3-line', price: 15, duration: 10 },
+    ];
 
-        const BARBERS = [
-            { id: 'luktinha', name: 'Lukiinha', role: 'Fundador', photo: '' },
-            { id: 'renan', name: 'Renan', role: 'Barbeiro', photo: '' },
-            { id: 'davi', name: 'Davi', role: 'Barbeiro', photo: '' },
-        ];
+    const BARBERS = [
+      { id: 'luktinha', name: 'Lukiinha', role: 'Fundador', photo: '' },
+      { id: 'renan', name: 'Renan', role: 'Barbeiro', photo: '' },
+      { id: 'davi', name: 'Davi', role: 'Barbeiro', photo: '' },
+    ];
 
-        const WEEKDAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+    const WEEKDAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
-        /* ===================== SUB-COMPONENTS ===================== */
+    /* ===================== SUB-COMPONENTS ===================== */
 
-        /* Sub-components are now modularized into separate files under js/components/
-           — they are loaded via <script> tags before this main app script. */
+    /* Sub-components are now modularized into separate files under js/components/
+       — they are loaded via <script> tags before this main app script. */
 
-        /* ===================== MAIN APP ===================== */
+    /* ===================== MAIN APP ===================== */
 
-        createApp({
-            components: {
-                TypingIndicator: window.TypingIndicator,
-                ServiceGrid: window.ServiceGrid,
-                BarberRow: window.BarberRow,
-                CalendarPicker: window.CalendarPicker,
-                TimeSlots: window.TimeSlots,
-            },
+    createApp({
+      components: {
+        TypingIndicator: window.TypingIndicator,
+        ServiceGrid: window.ServiceGrid,
+        BarberRow: window.BarberRow,
+        CalendarPicker: window.CalendarPicker,
+        TimeSlots: window.TimeSlots,
+      },
 
-            setup() {
-                const loadingShell = ref(true);
-                const messages = ref([]);
-                const isTyping = ref(false);
-                const scrollEl = ref(null);
-                const nameInput = ref('');
-                const phoneInput = ref('');
+      setup() {
+        const loadingShell = ref(true);
+        const messages = ref([]);
+        const isTyping = ref(false);
+        const scrollEl = ref(null);
+        const nameInput = ref('');
+        const phoneInput = ref('');
 
-                const booking = reactive({
-                    service: null,
-                    barber: null,
-                    date: null,
-                    time: null,
-                });
+        const booking = reactive({
+          service: null,
+          barber: null,
+          date: null,
+          time: null,
+        });
 
-                const customer = reactive({
-                    name: '',
-                    phone: '',
-                });
+        const customer = reactive({
+          name: '',
+          phone: '',
+        });
 
-                const stage = ref('greeting'); // greeting -> name -> phone -> service -> barber -> date -> time -> summary -> done
+        const stage = ref('greeting'); // greeting -> name -> phone -> service -> barber -> date -> time -> summary -> done
 
-                let msgId = 0;
-                function nowLabel() {
-                    return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                }
+        let msgId = 0;
+        function nowLabel() {
+          return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        }
 
-                async function scrollToBottom() {
-                    await nextTick();
-                    if (scrollEl.value) {
-                        scrollEl.value.scrollTo({ top: scrollEl.value.scrollHeight, behavior: 'smooth' });
-                    }
-                }
+        async function scrollToBottom() {
+          await nextTick();
+          if (scrollEl.value) {
+            scrollEl.value.scrollTo({ top: scrollEl.value.scrollHeight, behavior: 'smooth' });
+          }
+        }
 
-                function pushBot(text, opts = {}) {
-                    messages.value.push({
-                        id: ++msgId,
-                        from: 'bot',
-                        text,
-                        time: nowLabel(),
-                        widget: opts.widget || null,
-                        showAvatar: true,
-                    });
-                    scrollToBottom();
-                }
+        function pushBot(text, opts = {}) {
+          messages.value.push({
+            id: ++msgId,
+            from: 'bot',
+            text,
+            time: nowLabel(),
+            widget: opts.widget || null,
+            showAvatar: true,
+          });
+          scrollToBottom();
+        }
 
-                function pushUser(text) {
-                    messages.value.push({
-                        id: ++msgId,
-                        from: 'user',
-                        text,
-                        time: nowLabel(),
-                    });
-                    scrollToBottom();
-                }
+        function pushUser(text) {
+          messages.value.push({
+            id: ++msgId,
+            from: 'user',
+            text,
+            time: nowLabel(),
+          });
+          scrollToBottom();
+        }
 
-                async function botSay(text, opts = {}) {
-                    isTyping.value = true;
-                    await scrollToBottom();
-                    const delay = opts.delay ?? Math.min(1400, 400 + text.length * 12);
-                    await new Promise(r => setTimeout(r, delay));
-                    isTyping.value = false;
-                    pushBot(text, opts);
-                }
+        async function botSay(text, opts = {}) {
+          isTyping.value = true;
+          await scrollToBottom();
+          const delay = opts.delay ?? Math.min(1400, 400 + text.length * 12);
+          await new Promise(r => setTimeout(r, delay));
+          isTyping.value = false;
+          pushBot(text, opts);
+        }
 
-                function fmtDate(d) {
-                    return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
-                }
-                function fmtDateShort(d) {
-                    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
-                }
+        function fmtDate(d) {
+          return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+        }
+        function fmtDateShort(d) {
+          return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
+        }
 
-                /* ---------- FLOW ---------- */
+        /* ---------- FLOW ---------- */
 
-                async function startFlow() {
-                    await botSay('Fala! Bem-vindo à Lukiinha Cortes 💈', { delay: 700 });
-                    await botSay('Sou o assistente de agendamento. Vamos marcar seu horário em menos de 1 minuto.', { delay: 900 });
-                    await botSay('Antes de tudo, me diz seu nome completo, por favor.', { widget: 'nameInput', delay: 700 });
-                    stage.value = 'name';
-                }
+        async function startFlow() {
+          await botSay('Fala! Bem-vindo à Lukiinha Cortes 💈', { delay: 700 });
+          await botSay('Sou o assistente de agendamento. Vamos marcar seu horário em menos de 1 minuto.', { delay: 900 });
+          await botSay('Antes de tudo, me diz seu nome completo, por favor.', { widget: 'nameInput', delay: 700 });
+          stage.value = 'name';
+        }
 
-                async function submitName() {
-                    const value = nameInput.value.trim();
-                    if (!value) return;
+        function dismissLatestWidget() {
+          const lastMessage = messages.value[messages.value.length - 1];
+          if (lastMessage && lastMessage.widget) {
+            lastMessage.widget = null;
+          }
+        }
 
-                    customer.name = value;
-                    pushUser(value);
-                    nameInput.value = '';
+        async function submitName() {
+          const value = nameInput.value.trim();
+          if (!value) return;
 
-                    await botSay('Perfeito! Agora me diz seu número de telefone para te avisar sobre o agendamento.', { widget: 'phoneInput', delay: 800 });
-                    stage.value = 'phone';
-                }
+          dismissLatestWidget();
+          customer.name = value;
+          pushUser(value);
+          nameInput.value = '';
 
-                async function submitPhone() {
-                    const value = phoneInput.value.trim();
-                    if (!value) return;
+          await botSay('Perfeito! Agora me diz seu número de telefone para te avisar sobre o agendamento.', { widget: 'phoneInput', delay: 800 });
+          stage.value = 'phone';
+        }
 
-                    customer.phone = value;
-                    pushUser(value);
-                    phoneInput.value = '';
+        async function submitPhone() {
+          const value = phoneInput.value.trim();
+          if (!value) return;
 
-                    await botSay('Ótimo! Agora vamos escolher o serviço.', { widget: 'service', delay: 800 });
-                    stage.value = 'service';
-                }
+          dismissLatestWidget();
+          customer.phone = value;
+          pushUser(value);
+          phoneInput.value = '';
 
-                async function selectService(service) {
-                    if (stage.value !== 'service') return;
-                    booking.service = service;
-                    pushUser(service.name);
-                    await botSay('Boa escolha. Com qual barbeiro você prefere?', { widget: 'barber', delay: 800 });
-                    stage.value = 'barber';
-                }
+          await botSay('Ótimo! Agora vamos escolher o serviço.', { widget: 'service', delay: 800 });
+          stage.value = 'service';
+        }
 
-                async function selectBarber(barber) {
-                    if (stage.value !== 'barber') return;
-                    booking.barber = barber;
-                    pushUser(barber.name);
-                    await botSay('Show! Agora escolhe o dia que fica melhor pra você:', { widget: 'calendar', delay: 800 });
-                    stage.value = 'date';
-                }
+        async function selectService(service) {
+          if (stage.value !== 'service') return;
+          booking.service = service;
+          pushUser(service.name);
+          await botSay('Boa escolha. Com qual barbeiro você prefere?', { widget: 'barber', delay: 800 });
+          stage.value = 'barber';
+        }
 
-                async function selectDate(date) {
-                    if (stage.value !== 'date') return;
-                    booking.date = date;
-                    booking.time = null;
-                    pushUser(fmtDate(date));
-                    await botSay('E qual horário funciona melhor?', { widget: 'time', delay: 800 });
-                    stage.value = 'time';
-                }
+        async function selectBarber(barber) {
+          if (stage.value !== 'barber') return;
+          booking.barber = barber;
+          pushUser(barber.name);
+          await botSay('Show! Agora escolhe o dia que fica melhor pra você:', { widget: 'calendar', delay: 800 });
+          stage.value = 'date';
+        }
 
-                const timeSlots = computed(() => {
-                    const base = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
-                    return base.map((t, i) => ({ time: t, full: i === 2 || i === 6 }));
-                });
+        async function selectDate(date) {
+          if (stage.value !== 'date') return;
+          booking.date = date;
+          booking.time = null;
+          pushUser(fmtDate(date));
+          await botSay('E qual horário funciona melhor?', { widget: 'time', delay: 800 });
+          stage.value = 'time';
+        }
 
-                async function selectTime(time) {
-                    if (stage.value !== 'time') return;
-                    booking.time = time;
-                    pushUser(time);
-                    await botSay('Perfeito, confere se está tudo certo:', { widget: 'summary', delay: 800 });
-                    stage.value = 'summary';
-                }
+        const timeSlots = computed(() => {
+          const base = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
+          return base.map((t, i) => ({ time: t, full: i === 2 || i === 6 }));
+        });
 
-                async function confirmBooking() {
-                    pushUser('Confirmar agendamento ✅');
-                    await botSay('Agendamento confirmado! Te espero lá 💈', { widget: 'success', delay: 900 });
-                    stage.value = 'done';
-                }
+        async function selectTime(time) {
+          if (stage.value !== 'time') return;
+          booking.time = time;
+          pushUser(time);
+          await botSay('Perfeito, confere se está tudo certo:', { widget: 'summary', delay: 800 });
+          stage.value = 'summary';
+        }
 
-                function restart() {
-                    messages.value = [];
-                    booking.service = null;
-                    booking.barber = null;
-                    booking.date = null;
-                    booking.time = null;
-                    customer.name = '';
-                    customer.phone = '';
-                    nameInput.value = '';
-                    phoneInput.value = '';
-                    stage.value = 'greeting';
-                    startFlow();
-                }
+        async function confirmBooking() {
+          pushUser('Confirmar agendamento ✅');
+          await botSay('Agendamento confirmado! Te espero lá 💈', { widget: 'success', delay: 900 });
+          stage.value = 'done';
+        }
 
-                onMounted(async () => {
-                    await new Promise(r => setTimeout(r, 1400));
-                    loadingShell.value = false;
-                    startFlow();
-                });
+        function restart() {
+          messages.value = [];
+          booking.service = null;
+          booking.barber = null;
+          booking.date = null;
+          booking.time = null;
+          customer.name = '';
+          customer.phone = '';
+          nameInput.value = '';
+          phoneInput.value = '';
+          stage.value = 'greeting';
+          startFlow();
+        }
 
-                return {
-                    loadingShell, messages, isTyping, scrollEl,
-                    booking, customer, stage, timeSlots,
-                    nameInput, phoneInput,
-                    submitName, submitPhone,
-                    selectService, selectBarber, selectDate, selectTime,
-                    confirmBooking, restart,
-                    fmtDate, fmtDateShort,
-                    SERVICES, BARBERS,
-                };
-            },
+        onMounted(async () => {
+          await new Promise(r => setTimeout(r, 1400));
+          loadingShell.value = false;
+          startFlow();
+        });
 
-            template: `
+        return {
+          loadingShell, messages, isTyping, scrollEl,
+          booking, customer, stage, timeSlots,
+          nameInput, phoneInput,
+          submitName, submitPhone,
+          selectService, selectBarber, selectDate, selectTime,
+          confirmBooking, restart,
+          fmtDate, fmtDateShort,
+          SERVICES, BARBERS,
+        };
+      },
+
+      template: `
     <div class="shell">
 
       <!-- HEADER -->
@@ -419,8 +428,8 @@
 
     </div>
   `
-        }).mount('#app');
-    </script>
+    }).mount('#app');
+  </script>
 </body>
 
 </html>
