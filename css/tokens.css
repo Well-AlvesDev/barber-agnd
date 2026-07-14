@@ -1,0 +1,37 @@
+/* ==========================================================================
+   Design Tokens — Luxe Cuts
+   Fonte única de verdade para cor, tipografia, espaçamento e raio.
+   Importe este arquivo antes de qualquer outro CSS do projeto.
+   ========================================================================== */
+
+:root{
+  /* Cor */
+  --color-bg: #0e0c0a;
+  --color-surface: #17140f;
+  --color-gold: #6a89cb;
+  --color-gold-light: #1c65ae;
+  --color-cream: #f4ede1;
+  --color-cream-dim: rgba(244,237,225,0.72);
+  --color-overlay-top: rgba(10,9,7,0.75);
+  --color-overlay-bottom: rgba(6,5,4,0.96);
+
+  /* Tipografia */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Manrope', -apple-system, sans-serif;
+
+  /* Raio */
+  --radius-pill: 999px;
+  --radius-md: 14px;
+
+  /* Espaçamento (escala 4px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Breakpoint de referência (uso em comentários / JS, CSS não lê isto) */
+  --bp-tablet: 720px;
+}

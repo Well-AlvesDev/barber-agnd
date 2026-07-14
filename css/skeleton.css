@@ -1,0 +1,44 @@
+/* ==========================================================================
+   Skeleton Loaders — genéricos e reutilizáveis
+   Depende de tokens.css.
+
+   Uso: aplique a classe base ".skeleton" em qualquer elemento que precise
+   do efeito shimmer, e combine com um modificador de tamanho/forma
+   específico do componente (definido no CSS do próprio componente),
+   ou defina width/height inline via :style no Vue.
+   ========================================================================== */
+
+@keyframes shimmer{
+  0%{ background-position: -200% 0; }
+  100%{ background-position: 200% 0; }
+}
+
+.skeleton{
+  background: linear-gradient(
+    90deg,
+    rgba(244,237,225,0.06) 25%,
+    rgba(244,237,225,0.14) 37%,
+    rgba(244,237,225,0.06) 63%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* Variante dourada — para skeletons sobre/próximos de elementos de destaque
+   (ex.: botão CTA principal) onde o shimmer neutro fica apagado demais. */
+.skeleton--accent{
+  background: linear-gradient(
+    90deg,
+    rgba(203,162,106,0.12) 25%,
+    rgba(203,162,106,0.24) 37%,
+    rgba(203,162,106,0.12) 63%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* Formas utilitárias comuns — combine com .skeleton */
+.skeleton--circle{ border-radius: 50%; }
+.skeleton--pill{ border-radius: var(--radius-pill); }
+.skeleton--text{ border-radius: 6px; }

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1">
+    <title>Lukiinha Cortes — Agendamento</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+
+    <script src="https://unpkg.com/vue@3.4.31/dist/vue.global.prod.js"></script>
+
+    <link rel="stylesheet" href="css/components/agendamento.css">
+</head>
+
+<body>
+
+    <div id="app"></div>
+
+    <!-- Component scripts (modularized) -->
+    <script src="js/components/TypingIndicator.js"></script>
+    <script src="js/components/ServiceGrid.js"></script>
+    <script src="js/components/BarberRow.js"></script>
+    <script src="js/components/CalendarPicker.js"></script>
+    <script src="js/components/TimeSlots.js"></script>
+
+    <script>
+        const { createApp, ref, reactive, computed, nextTick, onMounted } = Vue;
+
+        /* ===================== DATA ===================== */
+
+        const SERVICES = [
+            { id: 'corte', name: 'Corte', icon: 'ri-scissors-2-line', price: 45, duration: 30 },
+            { id: 'barba', name: 'Barba', icon: 'ri-knife-blood-line', price: 35, duration: 20 },
+            { id: 'combo', name: 'Corte + Barba', icon: 'ri-magic-line', price: 70, duration: 50 },
+            { id: 'sobrancelha', name: 'Sobrancelha', icon: 'ri-focus-3-line', price: 15, duration: 10 },
+        ];
+
+        const BARBERS = [
+            { id: 'luktinha', name: 'Lukiinha', role: 'Fundador', photo: '' },
+            { id: 'renan', name: 'Renan', role: 'Barbeiro', photo: '' },
+            { id: 'davi', name: 'Davi', role: 'Barbeiro', photo: '' },
+        ];
+
+        const WEEKDAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+
+        /* ===================== SUB-COMPONENTS ===================== */
+
+        /* Sub-components are now modularized into separate files under js/components/
+           — they are loaded via <script> tags before this main app script. */
+
+        /* ===================== MAIN APP ===================== */
+
+        createApp({
+            components: {
+                TypingIndicator: window.TypingIndicator,
+                ServiceGrid: window.ServiceGrid,
+                BarberRow: window.BarberRow,
+                CalendarPicker: window.CalendarPicker,
+                TimeSlots: window.TimeSlots,
+            },
+
+            setup() {
+                const loadingShell = ref(true);
+                const messages = ref([]);
+                const isTyping = ref(false);
+                const scrollEl = ref(null);
+                const nameInput = ref('');
+                const phoneInput = ref('');
+
+                const booking = reactive({
+                    service: null,
+                    barber: null,
+                    date: null,
+                    time: null,
+                });
+
+                const customer = reactive({
+                    name: '',
+                    phone: '',
+                });
+
+                const stage = ref('greeting'); // greeting -> name -> phone -> service -> barber -> date -> time -> summary -> done
+
+                let msgId = 0;
+                function nowLabel() {
+                    return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                }
+
+                async function scrollToBottom() {
+                    await nextTick();
+                    if (scrollEl.value) {
+                        scrollEl.value.scrollTo({ top: scrollEl.value.scrollHeight, behavior: 'smooth' });
+                    }
+                }
+
+                function pushBot(text, opts = {}) {
+                    messages.value.push({
+                        id: ++msgId,
+                        from: 'bot',
+                        text,
+                        time: nowLabel(),
+                        widget: opts.widget || null,
+                        showAvatar: true,
+                    });
+                    scrollToBottom();
+                }
+
+                function pushUser(text) {
+                    messages.value.push({
+                        id: ++msgId,
+                        from: 'user',
+                        text,
+                        time: nowLabel(),
+                    });
+                    scrollToBottom();
+                }
+
+                async function botSay(text, opts = {}) {
+                    isTyping.value = true;
+                    await scrollToBottom();
+                    const delay = opts.delay ?? Math.min(1400, 400 + text.length * 12);
+                    await new Promise(r => setTimeout(r, delay));
+                    isTyping.value = false;
+                    pushBot(text, opts);
+                }
+
+                function fmtDate(d) {
+                    return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+                }
+                function fmtDateShort(d) {
+                    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
+                }
+
+                /* ---------- FLOW ---------- */
+
+                async function startFlow() {
+                    await botSay('Fala! Bem-vindo à Lukiinha Cortes 💈', { delay: 700 });
+                    await botSay('Sou o assistente de agendamento. Vamos marcar seu horário em menos de 1 minuto.', { delay: 900 });
+                    await botSay('Antes de tudo, me diz seu nome completo, por favor.', { widget: 'nameInput', delay: 700 });
+                    stage.value = 'name';
+                }
+
+                async function submitName() {
+                    const value = nameInput.value.trim();
+                    if (!value) return;
+
+                    customer.name = value;
+                    pushUser(value);
+                    nameInput.value = '';
+
+                    await botSay('Perfeito! Agora me diz seu número de telefone para te avisar sobre o agendamento.', { widget: 'phoneInput', delay: 800 });
+                    stage.value = 'phone';
+                }
+
+                async function submitPhone() {
+                    const value = phoneInput.value.trim();
+                    if (!value) return;
+
+                    customer.phone = value;
+                    pushUser(value);
+                    phoneInput.value = '';
+
+                    await botSay('Ótimo! Agora vamos escolher o serviço.', { widget: 'service', delay: 800 });
+                    stage.value = 'service';
+                }
+
+                async function selectService(service) {
+                    if (stage.value !== 'service') return;
+                    booking.service = service;
+                    pushUser(service.name);
+                    await botSay('Boa escolha. Com qual barbeiro você prefere?', { widget: 'barber', delay: 800 });
+                    stage.value = 'barber';
+                }
+
+                async function selectBarber(barber) {
+                    if (stage.value !== 'barber') return;
+                    booking.barber = barber;
+                    pushUser(barber.name);
+                    await botSay('Show! Agora escolhe o dia que fica melhor pra você:', { widget: 'calendar', delay: 800 });
+                    stage.value = 'date';
+                }
+
+                async function selectDate(date) {
+                    if (stage.value !== 'date') return;
+                    booking.date = date;
+                    booking.time = null;
+                    pushUser(fmtDate(date));
+                    await botSay('E qual horário funciona melhor?', { widget: 'time', delay: 800 });
+                    stage.value = 'time';
+                }
+
+                const timeSlots = computed(() => {
+                    const base = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
+                    return base.map((t, i) => ({ time: t, full: i === 2 || i === 6 }));
+                });
+
+                async function selectTime(time) {
+                    if (stage.value !== 'time') return;
+                    booking.time = time;
+                    pushUser(time);
+                    await botSay('Perfeito, confere se está tudo certo:', { widget: 'summary', delay: 800 });
+                    stage.value = 'summary';
+                }
+
+                async function confirmBooking() {
+                    pushUser('Confirmar agendamento ✅');
+                    await botSay('Agendamento confirmado! Te espero lá 💈', { widget: 'success', delay: 900 });
+                    stage.value = 'done';
+                }
+
+                function restart() {
+                    messages.value = [];
+                    booking.service = null;
+                    booking.barber = null;
+                    booking.date = null;
+                    booking.time = null;
+                    customer.name = '';
+                    customer.phone = '';
+                    nameInput.value = '';
+                    phoneInput.value = '';
+                    stage.value = 'greeting';
+                    startFlow();
+                }
+
+                onMounted(async () => {
+                    await new Promise(r => setTimeout(r, 1400));
+                    loadingShell.value = false;
+                    startFlow();
+                });
+
+                return {
+                    loadingShell, messages, isTyping, scrollEl,
+                    booking, customer, stage, timeSlots,
+                    nameInput, phoneInput,
+                    submitName, submitPhone,
+                    selectService, selectBarber, selectDate, selectTime,
+                    confirmBooking, restart,
+                    fmtDate, fmtDateShort,
+                    SERVICES, BARBERS,
+                };
+            },
+
+            template: `
+    <div class="shell">
+
+      <!-- HEADER -->
+      <header class="chat-header" v-if="!loadingShell">
+        <div class="logo-wrap">
+          <img src="../../logo.png" alt="Lukiinha Cortes Logo" class="logo-image">
+          <div class="status-indicator">
+            <span class="status-dot-inline"></span>
+            <transition name="fade" mode="out-in">
+              <span v-if="isTyping" class="typing-inline" key="t">digitando...</span>
+              <span v-else key="o">online</span>
+            </transition>
+          </div>
+        </div>
+        <div class="header-action"><i class="ri-more-2-fill"></i></div>
+      </header>
+
+      <!-- HEADER SKELETON -->
+      <header class="skel-header" v-else>
+        <div class="skeleton skel-avatar"></div>
+        <div class="skel-lines">
+          <div class="skeleton skel-line" style="width:55%"></div>
+          <div class="skeleton skel-line" style="width:35%;margin-bottom:0"></div>
+        </div>
+      </header>
+
+      <div class="scroll-fade" v-if="!loadingShell"></div>
+
+      <!-- MESSAGES -->
+      <main class="messages" ref="scrollEl" v-if="!loadingShell">
+        <div class="day-divider">Hoje</div>
+
+        <transition-group name="msg" tag="div">
+          <template v-for="(m, idx) in messages" :key="m.id">
+
+            <div class="row" :class="m.from">
+              <div class="row-avatar-spacer" v-if="m.from==='bot'"></div>
+              <div class="bubble-col">
+                <div class="bubble" :class="m.from">
+                  {{ m.text }}
+                  <span class="meta-time">{{ m.time }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Inline widgets attached to a bot message. They stay visible after
+                 a choice is made (showing the selection), but become inert. -->
+            <form v-if="m.widget === 'nameInput'" class="inline-form" @submit.prevent="submitName">
+              <label class="inline-label" for="customer-name">Nome completo</label>
+              <div class="inline-input-row">
+                <input id="customer-name" v-model="nameInput" type="text" placeholder="Ex.: João da Silva" autocomplete="name" required>
+                <button type="submit" class="inline-submit-btn"><i class="ri-arrow-right-line"></i></button>
+              </div>
+            </form>
+
+            <form v-if="m.widget === 'phoneInput'" class="inline-form" @submit.prevent="submitPhone">
+              <label class="inline-label" for="customer-phone">Telefone</label>
+              <div class="inline-input-row">
+                <input id="customer-phone" v-model="phoneInput" type="tel" inputmode="tel" placeholder="Ex.: (11) 99999-9999" autocomplete="tel" required>
+                <button type="submit" class="inline-submit-btn"><i class="ri-arrow-right-line"></i></button>
+              </div>
+            </form>
+
+            <ServiceGrid
+              v-if="m.widget === 'service'"
+              class="widget-locked"
+              :class="{ 'widget-locked': stage !== 'service' }"
+              :services="SERVICES"
+              :selectedId="booking.service?.id"
+              :locked="stage !== 'service'"
+              @select="selectService"
+            />
+
+            <BarberRow
+              v-if="m.widget === 'barber'"
+              :barbers="BARBERS"
+              :selectedId="booking.barber?.id"
+              :locked="stage !== 'barber'"
+              @select="selectBarber"
+            />
+
+            <CalendarPicker
+              v-if="m.widget === 'calendar'"
+              :selectedDate="booking.date"
+              :locked="stage !== 'date'"
+              @select="selectDate"
+            />
+
+            <TimeSlots
+              v-if="m.widget === 'time'"
+              :slots="timeSlots"
+              :selectedTime="booking.time"
+              :locked="stage !== 'time'"
+              @select="selectTime"
+            />
+
+            <div class="summary-card" v-if="m.widget === 'summary'">
+              <div class="summary-title"><i class="ri-file-list-3-line"></i>Resumo do agendamento</div>
+              <div class="summary-row">
+                <span class="label"><i class="ri-scissors-2-line"></i>Serviço</span>
+                <span class="value">{{ booking.service?.name }}</span>
+              </div>
+              <div class="summary-row">
+                <span class="label"><i class="ri-user-3-line"></i>Barbeiro</span>
+                <span class="value">{{ booking.barber?.name }}</span>
+              </div>
+              <div class="summary-row">
+                <span class="label"><i class="ri-user-3-line"></i>Cliente</span>
+                <span class="value">{{ customer.name }}</span>
+              </div>
+              <div class="summary-row">
+                <span class="label"><i class="ri-phone-line"></i>Telefone</span>
+                <span class="value">{{ customer.phone }}</span>
+              </div>
+              <div class="summary-row">
+                <span class="label"><i class="ri-calendar-check-line"></i>Data</span>
+                <span class="value" style="text-transform:capitalize">{{ fmtDate(booking.date) }}</span>
+              </div>
+              <div class="summary-row">
+                <span class="label"><i class="ri-time-line"></i>Horário</span>
+                <span class="value">{{ booking.time }}</span>
+              </div>
+              <div class="summary-total">
+                <span class="label">Total</span>
+                <span class="value">R$ {{ booking.service?.price }}</span>
+              </div>
+              <button class="confirm-btn" v-if="stage === 'summary'" @click="confirmBooking">
+                <i class="ri-checkbox-circle-fill"></i> Confirmar agendamento
+              </button>
+            </div>
+
+            <div class="success-card" v-if="m.widget === 'success'">
+              <div class="success-icon"><i class="ri-check-line"></i></div>
+              <div class="success-title">Tudo certo!</div>
+              <div class="success-sub">
+                {{ booking.service?.name }} com {{ booking.barber?.name }}<br>
+                {{ fmtDateShort(booking.date) }} às {{ booking.time }}
+              </div>
+              <button class="confirm-btn" style="margin-top:16px;background:transparent;border:1px solid var(--line-strong);box-shadow:none" @click="restart">
+                <i class="ri-add-line"></i> Novo agendamento
+              </button>
+            </div>
+
+          </template>
+        </transition-group>
+
+        <transition name="fade">
+          <TypingIndicator v-if="isTyping" />
+        </transition>
+
+      </main>
+
+      <!-- MESSAGES SKELETON -->
+      <main class="messages" v-else>
+        <div class="skel-msg-row">
+          <div class="skeleton skel-avatar-sm"></div>
+          <div class="skeleton skel-bubble" style="width:60%"></div>
+        </div>
+        <div class="skel-msg-row">
+          <div class="skeleton skel-avatar-sm"></div>
+          <div class="skeleton skel-bubble" style="width:75%"></div>
+        </div>
+        <div class="skel-cards">
+          <div class="skeleton skel-card"></div>
+          <div class="skeleton skel-card"></div>
+          <div class="skeleton skel-card"></div>
+          <div class="skeleton skel-card"></div>
+        </div>
+      </main>
+
+    </div>
+  `
+        }).mount('#app');
+    </script>
+</body>
+
+</html>

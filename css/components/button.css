@@ -1,0 +1,59 @@
+/* ==========================================================================
+   Componente: Button (CTA primário)
+   Depende de tokens.css e skeleton.css
+   Reutilizável fora do Hero — basta importar este arquivo e usar .btn-primary
+   ========================================================================== */
+
+.hero__cta-wrap{
+  padding: var(--space-4) var(--space-5) calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+}
+
+.btn-primary{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  background: rgb(5, 36, 138);
+  color: #eeeeee;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 17px var(--space-5);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  box-shadow: 0 8px 24px rgba(106, 145, 203, 0.28);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-primary:active{
+  transform: scale(0.97);
+}
+
+.btn-primary:disabled{
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+}
+
+.btn-primary i{
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.btn-primary__spinner{
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(184, 184, 184, 0.3);
+  border-top-color: #ffffff;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin{ to{ transform: rotate(360deg); } }
+
+.skeleton-cta{
+  height: 54px;
+}

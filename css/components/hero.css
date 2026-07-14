@@ -1,0 +1,94 @@
+/* ==========================================================================
+   Componente: Hero
+   Depende de tokens.css e skeleton.css
+   ========================================================================== */
+
+.hero{
+  position: relative;
+  min-height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* Camada de imagem de fundo — pronta para receber a foto real.
+   O componente Hero.js seta a variável --hero-bg-image inline
+   assim que `heroImageUrl` estiver preenchida. */
+.hero__bg{
+  position: absolute;
+  inset: 0;
+  background-color: #1a1712; /* fallback enquanto não há imagem */
+  background-image: var(--hero-bg-image, none);
+  background-size: cover;
+  background-position: center 30%;
+  background-repeat: no-repeat;
+  transition: opacity 0.6s ease;
+}
+
+.hero__bg--empty{
+  opacity: 1;
+}
+
+/* Overlay em gradiente para garantir contraste do texto sobre a foto */
+.hero__overlay{
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    var(--color-overlay-top) 0%,
+    rgba(10,9,7,0.35) 35%,
+    rgba(10,9,7,0.55) 60%,
+    var(--color-overlay-bottom) 100%
+  );
+}
+
+.hero__content{
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  width: 100%;
+}
+
+.hero__spacer{ flex: 1 1 auto; }
+
+.hero__copy{
+  padding: 0 var(--space-5) var(--space-3);
+}
+
+.hero__title{
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.9rem, 8vw, 2.6rem);
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+  color: var(--color-cream);
+  max-width: 20ch;
+}
+
+.hero__title em{
+  font-style: normal;
+  color: var(--color-gold-light);
+}
+
+.hero__copy .skeleton{
+  height: 1.5em;
+  margin-bottom: var(--space-2);
+}
+.hero__copy .skeleton:last-child{ margin-bottom: 0; }
+
+/* Desktop / tablet: hero centralizado, não esticado */
+@media (min-width: 720px){
+  .hero__content{
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .hero__bg, .hero__overlay{
+    max-width: 480px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}

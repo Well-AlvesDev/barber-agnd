@@ -1,0 +1,39 @@
+/* ==========================================================================
+   Base — reset mínimo + estilos globais
+   Depende de tokens.css (variáveis --color-*, --font-*)
+   ========================================================================== */
+
+*{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body{
+  background: var(--color-bg);
+  color: var(--color-cream);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  height: 100%;
+}
+
+#app{ height: 100%; }
+
+img, svg{ display: block; max-width: 100%; }
+
+button{ font-family: inherit; }
+
+a{ color: inherit; }
+
+@media (prefers-reduced-motion: reduce){
+  *{
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Transição genérica de fade usada por qualquer componente que troque
+   skeleton -> conteúdo real via <Transition name="fade"> */
+.fade-enter-active{ transition: opacity 0.35s ease; }
+.fade-enter-from{ opacity: 0; }
