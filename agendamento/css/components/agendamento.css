@@ -232,9 +232,9 @@ body {
     color: #3ED598;
 }
 
+.header-back,
 .header-action {
     position: absolute;
-    right: 16px;
     width: 38px;
     height: 38px;
     border-radius: 50%;
@@ -246,11 +246,142 @@ body {
     color: var(--text-dim);
     font-size: 18px;
     transition: background 0.2s var(--ease-soft), transform 0.15s var(--ease-soft);
+    text-decoration: none;
 }
 
+.header-back {
+    left: 16px;
+}
+
+.header-action {
+    right: 16px;
+}
+
+.header-back:active,
 .header-action:active {
     transform: scale(0.92);
     background: var(--surface-2);
+}
+
+.header-action {
+    border: 1px solid var(--line);
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    padding: 0;
+}
+
+.header-action.active {
+    background: var(--surface-2);
+    border-color: var(--line-strong);
+    color: var(--text);
+}
+
+/* ============ HEADER MENU (iOS liquid glass) ============ */
+.header-menu-wrap {
+    position: absolute;
+    right: 16px;
+    top: max(14px, env(safe-area-inset-top));
+}
+
+.glass-menu {
+    position: absolute;
+    top: calc(38px + 10px);
+    right: 0;
+    min-width: 240px;
+    padding: 6px;
+    border-radius: 20px;
+    background:
+        linear-gradient(155deg, rgba(255, 255, 255, 0.22), rgba(65, 65, 65, 0.261) 40%, rgba(255, 255, 255, 0.08) 100%),
+        rgba(24, 26, 36, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow:
+        0 12px 36px rgba(0, 0, 0, 0.45),
+        0 2px 8px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    transform-origin: top right;
+    overflow: hidden;
+    z-index: 30;
+    isolation: isolate;
+}
+
+.glass-menu-sheen {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(80% 60% at 85% 0%, rgba(255, 255, 255, 0.14), transparent 60%);
+    mix-blend-mode: screen;
+}
+
+.glass-menu-item {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 14px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14.5px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: background 0.18s var(--ease-soft), transform 0.15s var(--ease-soft);
+}
+
+.glass-menu-item:active {
+    transform: scale(0.97);
+    background: rgba(255, 255, 255, 0.09);
+}
+
+@media (hover: hover) {
+    .glass-menu-item:hover {
+        background: rgba(255, 255, 255, 0.07);
+    }
+}
+
+.glass-menu-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 15px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+}
+
+.glass-menu-item.danger .glass-menu-icon {
+    color: var(--red-500);
+    background: rgba(232, 54, 46, 0.12);
+    border-color: rgba(232, 54, 46, 0.18);
+}
+
+.glass-menu-item.danger:active {
+    background: rgba(232, 54, 46, 0.1);
+}
+
+.glass-menu-label {
+    flex: 1;
+    white-space: nowrap;
+}
+
+.glass-menu-divider {
+    height: 1px;
+    margin: 4px 8px;
+    background: rgba(255, 255, 255, 0.09);
 }
 
 /* ============ MESSAGES ============ */

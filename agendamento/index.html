@@ -14,6 +14,7 @@
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
 
   <script src="https://unpkg.com/vue@3.4.31/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 
   <link rel="stylesheet" href="./css/components/agendamento.css">
 </head>
@@ -72,6 +73,59 @@
         const scrollEl = ref(null);
         const nameInput = ref('');
         const phoneInput = ref('');
+        const menuOpen = ref(false);
+        const menuEl = ref(null);
+        const menuBtnEl = ref(null);
+
+        function toggleMenu() {
+          menuOpen.value = !menuOpen.value;
+        }
+
+        function closeMenu() {
+          menuOpen.value = false;
+        }
+
+        function onMenuEnter(el, done) {
+          gsap.killTweensOf(el);
+          gsap.fromTo(el,
+            { opacity: 0, scale: 0.82, y: -14, filter: 'blur(6px)' },
+            {
+              opacity: 1, scale: 1, y: 0, filter: 'blur(0px)',
+              duration: 0.55, ease: 'elastic.out(1, 0.75)', onComplete: done
+            }
+          );
+          const items = el.querySelectorAll('.glass-menu-item');
+          gsap.fromTo(items,
+            { opacity: 0, x: 10 },
+            { opacity: 1, x: 0, duration: 0.4, stagger: 0.06, delay: 0.12, ease: 'power3.out' }
+          );
+        }
+
+        function onMenuLeave(el, done) {
+          gsap.killTweensOf(el);
+          gsap.to(el, {
+            opacity: 0, scale: 0.85, y: -10, filter: 'blur(4px)',
+            duration: 0.3, ease: 'power2.in', onComplete: done
+          });
+        }
+
+        function goToBookings() {
+          closeMenu();
+          // Página "Meus agendamentos" ainda não implementada.
+        }
+
+        function restartFromMenu() {
+          closeMenu();
+          restart();
+        }
+
+        function onDocClick(e) {
+          if (!menuOpen.value) return;
+          const t = e.target;
+          if (menuEl.value && menuEl.value.contains(t)) return;
+          if (menuBtnEl.value && menuBtnEl.value.contains(t)) return;
+          closeMenu();
+        }
 
         const booking = reactive({
           service: null,
@@ -238,6 +292,8 @@
         }
 
         onMounted(async () => {
+          document.addEventListener('click', onDocClick, true);
+          document.addEventListener('touchstart', onDocClick, true);
           await new Promise(r => setTimeout(r, 1400));
           loadingShell.value = false;
           startFlow();
@@ -252,6 +308,8 @@
           confirmBooking, restart,
           fmtDate, fmtDateShort,
           SERVICES, BARBERS,
+          menuOpen, menuEl, menuBtnEl, toggleMenu, closeMenu,
+          onMenuEnter, onMenuLeave, goToBookings, restartFromMenu,
         };
       },
 
@@ -260,6 +318,9 @@
 
       <!-- HEADER -->
       <header class="chat-header" v-if="!loadingShell">
+        <a class="header-back" href="../index.html" aria-label="Voltar para a página inicial">
+          <i class="ri-arrow-left-line"></i>
+        </a>
         <div class="logo-wrap">
           <img src="../../logo.png" alt="Lukiinha Cortes Logo" class="logo-image">
           <div class="status-indicator">
@@ -270,7 +331,34 @@
             </transition>
           </div>
         </div>
-        <div class="header-action"><i class="ri-more-2-fill"></i></div>
+        <div class="header-menu-wrap">
+          <button
+            class="header-action"
+            :class="{ active: menuOpen }"
+            ref="menuBtnEl"
+            type="button"
+            aria-label="Mais opções"
+            :aria-expanded="menuOpen"
+            @click.stop="toggleMenu"
+          >
+            <i class="ri-more-2-fill"></i>
+          </button>
+
+          <transition @enter="onMenuEnter" @leave="onMenuLeave" :css="false">
+            <div v-if="menuOpen" class="glass-menu" ref="menuEl" role="menu">
+              <div class="glass-menu-sheen"></div>
+              <button class="glass-menu-item" role="menuitem" type="button" @click="goToBookings">
+                <span class="glass-menu-icon"><i class="ri-calendar-check-line"></i></span>
+                <span class="glass-menu-label">Ver meus agendamentos</span>
+              </button>
+              <div class="glass-menu-divider"></div>
+              <button class="glass-menu-item danger" role="menuitem" type="button" @click="restartFromMenu">
+                <span class="glass-menu-icon"><i class="ri-restart-line"></i></span>
+                <span class="glass-menu-label">Reiniciar</span>
+              </button>
+            </div>
+          </transition>
+        </div>
       </header>
 
       <!-- HEADER SKELETON -->
