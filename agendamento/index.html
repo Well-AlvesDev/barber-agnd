@@ -43,9 +43,7 @@
     ];
 
     const BARBERS = [
-      { id: 'luktinha', name: 'Lukiinha', role: 'Fundador', photo: '' },
-      { id: 'renan', name: 'Renan', role: 'Barbeiro', photo: '' },
-      { id: 'davi', name: 'Davi', role: 'Barbeiro', photo: '' },
+      { id: 'luktinha', name: 'Lukiinha', role: 'Fundador', photo: '' }
     ];
 
     const WEEKDAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
@@ -68,6 +66,7 @@
 
       setup() {
         const loadingShell = ref(true);
+        const starting = ref(false);
         const messages = ref([]);
         const isTyping = ref(false);
         const scrollEl = ref(null);
@@ -115,6 +114,7 @@
         }
 
         function restartFromMenu() {
+          if (starting.value) return;
           closeMenu();
           restart();
         }
@@ -194,10 +194,15 @@
         /* ---------- FLOW ---------- */
 
         async function startFlow() {
-          await botSay('Fala! Bem-vindo à Lukiinha Cortes 💈', { delay: 700 });
-          await botSay('Sou o assistente de agendamento. Vamos marcar seu horário em menos de 1 minuto.', { delay: 900 });
-          await botSay('Antes de tudo, me diz seu nome completo, por favor.', { widget: 'nameInput', delay: 700 });
-          stage.value = 'name';
+          starting.value = true;
+          try {
+            await botSay('Fala! Bem-vindo à Lukiinha Cortes 💈', { delay: 700 });
+            await botSay('Sou o assistente de agendamento. Vamos marcar seu horário em menos de 1 minuto.', { delay: 900 });
+            await botSay('Antes de tudo, me diz seu nome completo, por favor.', { widget: 'nameInput', delay: 700 });
+            stage.value = 'name';
+          } finally {
+            starting.value = false;
+          }
         }
 
         function dismissLatestWidget() {
@@ -248,6 +253,14 @@
           dismissLatestWidget();
           const names = booking.services.map(s => s.name).join(', ');
           pushUser(names);
+
+          if (BARBERS.length === 1) {
+            booking.barber = BARBERS[0];
+            await botSay(`Boa escolha. ${BARBERS[0].name} será seu barbeiro. Agora escolhe o dia que fica melhor pra você:`, { widget: 'calendar', delay: 800 });
+            stage.value = 'date';
+            return;
+          }
+
           await botSay('Boa escolha. Com qual barbeiro você prefere?', { widget: 'barber', delay: 800 });
           stage.value = 'barber';
         }
@@ -291,6 +304,8 @@
         }
 
         function restart() {
+          if (starting.value) return;
+          starting.value = true;
           messages.value = [];
           booking.services = [];
           booking.barber = null;
@@ -313,7 +328,7 @@
         });
 
         return {
-          loadingShell, messages, isTyping, scrollEl,
+          loadingShell, starting, messages, isTyping, scrollEl,
           booking, customer, stage, timeSlots,
           nameInput, phoneInput,
           submitName, submitPhone,
@@ -365,7 +380,7 @@
                 <span class="glass-menu-label">Ver meus agendamentos</span>
               </button>
               <div class="glass-menu-divider"></div>
-              <button class="glass-menu-item danger" role="menuitem" type="button" @click="restartFromMenu">
+              <button class="glass-menu-item danger" role="menuitem" type="button" :disabled="starting" :aria-disabled="starting" @click="restartFromMenu">
                 <span class="glass-menu-icon"><i class="ri-restart-line"></i></span>
                 <span class="glass-menu-label">Reiniciar</span>
               </button>

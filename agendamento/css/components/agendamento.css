@@ -378,6 +378,18 @@ body {
     background: rgba(232, 54, 46, 0.1);
 }
 
+.glass-menu-item:disabled,
+.glass-menu-item[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.45;
+    background: transparent;
+}
+
+.glass-menu-item:disabled .glass-menu-icon,
+.glass-menu-item[aria-disabled="true"] .glass-menu-icon {
+    opacity: 0.55;
+}
+
 .glass-menu-label {
     flex: 1;
     white-space: nowrap;
