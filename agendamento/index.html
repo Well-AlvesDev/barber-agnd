@@ -36,10 +36,10 @@
     /* ===================== DATA ===================== */
 
     const SERVICES = [
-      { id: 'corte', name: 'Corte', icon: 'ri-scissors-2-line', price: 45, duration: 30 },
-      { id: 'barba', name: 'Barba', icon: 'ri-knife-blood-line', price: 35, duration: 20 },
-      { id: 'combo', name: 'Corte + Barba', icon: 'ri-magic-line', price: 70, duration: 50 },
-      { id: 'sobrancelha', name: 'Sobrancelha', icon: 'ri-focus-3-line', price: 15, duration: 10 },
+      { id: 'corte', name: 'Corte', image: './img/corte.jpg', price: 20, duration: 30 },
+      { id: 'barba', name: 'Barba', image: './img/barba.jpg', price: 15, duration: 20 },
+      { id: 'combo', name: 'Corte + Barba', image: './img/combo.jpg', price: 35, duration: 50 },
+      { id: 'sobrancelha', name: 'Sobrancelha', image: './img/sobrancelha.jpg', price: 5, duration: 10 },
     ];
 
     const BARBERS = [
@@ -128,7 +128,7 @@
         }
 
         const booking = reactive({
-          service: null,
+          services: [],
           barber: null,
           date: null,
           time: null,
@@ -233,10 +233,21 @@
           stage.value = 'service';
         }
 
-        async function selectService(service) {
+        function toggleService(service) {
           if (stage.value !== 'service') return;
-          booking.service = service;
-          pushUser(service.name);
+          const index = booking.services.findIndex(s => s.id === service.id);
+          if (index === -1) {
+            booking.services.push(service);
+          } else {
+            booking.services.splice(index, 1);
+          }
+        }
+
+        async function sendServices() {
+          if (stage.value !== 'service' || booking.services.length === 0) return;
+          dismissLatestWidget();
+          const names = booking.services.map(s => s.name).join(', ');
+          pushUser(names);
           await botSay('Boa escolha. Com qual barbeiro você prefere?', { widget: 'barber', delay: 800 });
           stage.value = 'barber';
         }
@@ -263,6 +274,8 @@
           return base.map((t, i) => ({ time: t, full: i === 2 || i === 6 }));
         });
 
+        const totalPrice = computed(() => booking.services.reduce((sum, service) => sum + service.price, 0));
+
         async function selectTime(time) {
           if (stage.value !== 'time') return;
           booking.time = time;
@@ -279,7 +292,7 @@
 
         function restart() {
           messages.value = [];
-          booking.service = null;
+          booking.services = [];
           booking.barber = null;
           booking.date = null;
           booking.time = null;
@@ -304,7 +317,7 @@
           booking, customer, stage, timeSlots,
           nameInput, phoneInput,
           submitName, submitPhone,
-          selectService, selectBarber, selectDate, selectTime,
+          toggleService, sendServices, selectBarber, selectDate, selectTime,
           confirmBooking, restart,
           fmtDate, fmtDateShort,
           SERVICES, BARBERS,
@@ -412,10 +425,15 @@
               class="widget-locked"
               :class="{ 'widget-locked': stage !== 'service' }"
               :services="SERVICES"
-              :selectedId="booking.service?.id"
+              :selectedIds="booking.services.map(s => s.id)"
               :locked="stage !== 'service'"
-              @select="selectService"
+              @toggle="toggleService"
             />
+            <div v-if="m.widget === 'service'" class="service-actions">
+              <button type="button" class="send-services-btn" :disabled="booking.services.length === 0" @click="sendServices">
+                Enviar ({{ booking.services.length }})
+              </button>
+            </div>
 
             <BarberRow
               v-if="m.widget === 'barber'"
@@ -443,8 +461,8 @@
             <div class="summary-card" v-if="m.widget === 'summary'">
               <div class="summary-title"><i class="ri-file-list-3-line"></i>Resumo do agendamento</div>
               <div class="summary-row">
-                <span class="label"><i class="ri-scissors-2-line"></i>Serviço</span>
-                <span class="value">{{ booking.service?.name }}</span>
+                <span class="label"><i class="ri-scissors-2-line"></i>Serviços</span>
+                <span class="value">{{ booking.services.map(s => s.name).join(', ') }}</span>
               </div>
               <div class="summary-row">
                 <span class="label"><i class="ri-user-3-line"></i>Barbeiro</span>
@@ -468,7 +486,7 @@
               </div>
               <div class="summary-total">
                 <span class="label">Total</span>
-                <span class="value">R$ {{ booking.service?.price }}</span>
+                <span class="value">R$ {{ totalPrice }}</span>
               </div>
               <button class="confirm-btn" v-if="stage === 'summary'" @click="confirmBooking">
                 <i class="ri-checkbox-circle-fill"></i> Confirmar agendamento
@@ -479,7 +497,7 @@
               <div class="success-icon"><i class="ri-check-line"></i></div>
               <div class="success-title">Tudo certo!</div>
               <div class="success-sub">
-                {{ booking.service?.name }} com {{ booking.barber?.name }}<br>
+                {{ booking.services.map(s => s.name).join(', ') }} com {{ booking.barber?.name }}<br>
                 {{ fmtDateShort(booking.date) }} às {{ booking.time }}
               </div>
               <button class="confirm-btn" style="margin-top:16px;background:transparent;border:1px solid var(--line-strong);box-shadow:none" @click="restart">
