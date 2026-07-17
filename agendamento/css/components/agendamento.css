@@ -923,7 +923,7 @@ body {
 .slot {
     padding: 9px 13px;
     border-radius: var(--radius-sm);
-    background: var(--surface);
+    background: #383737;
     border: 1px solid var(--line);
     font-size: 13px;
     font-weight: 600;
@@ -947,6 +947,35 @@ body {
 .slot.full {
     opacity: 0.35;
     text-decoration: line-through;
+    pointer-events: none;
+}
+
+.datetime-submit-wrap {
+    margin: 10px 0 0;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.send-time-btn {
+    padding: 11px 18px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(155deg, var(--blue-500), var(--blue-600));
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px -4px var(--blue-glow);
+    transition: transform 0.15s var(--ease-soft), box-shadow 0.2s var(--ease-soft);
+}
+
+.send-time-btn:active {
+    transform: scale(0.97);
+}
+
+.send-time-btn:disabled {
+    opacity: 0.45;
+    box-shadow: none;
     pointer-events: none;
 }
 
@@ -1038,7 +1067,7 @@ body {
 }
 
 .summary-total .value {
-    font-family: 'Fraunces', serif;
+    font-family: 'Inter', sans-serif;
     font-size: 22px;
     font-weight: 600;
     color: var(--text);
@@ -1132,6 +1161,25 @@ body {
     animation: pop-in 0.5s var(--ease-spring) 0.15s backwards;
 }
 
+.success-image-note {
+    margin: 14px 0 10px;
+    font-size: 13px;
+    color: var(--text-dim);
+}
+
+.success-image-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.success-image-wrap img {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 18px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+}
+
 @keyframes pop-in {
     from {
         transform: scale(0);
@@ -1155,6 +1203,14 @@ body {
     font-size: 12.5px;
     color: var(--text-dim);
     line-height: 1.5;
+}
+
+.success-datetime {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-strong);
+    display: inline-block;
+    margin-top: 6px;
 }
 
 /* ============ INPUT BAR ============ */
@@ -1315,6 +1371,18 @@ body {
     opacity: 0;
 }
 
+.widget-fade-enter-active,
+.widget-fade-leave-active {
+    transition: opacity 0.18s var(--ease-soft), transform 0.18s var(--ease-soft);
+}
+
+.widget-fade-enter-from,
+.widget-fade-leave-to {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+
 /* datetime picker styles */
 .datetime-picker-wrap {
     margin: 8px 0 14px 34px;
@@ -1328,6 +1396,10 @@ body {
     border: 1px solid rgba(47, 95, 240, 0.3);
     border-radius: var(--radius-md);
     animation: chip-in 0.42s var(--ease-spring) forwards;
+}
+
+.selected-choice-summary {
+    margin: 12px 0 0;
 }
 
 .badge-content {

@@ -1,6 +1,6 @@
 window.DateTimePicker = {
   props: ['selectedDate', 'selectedTime', 'timeSlots', 'locked'],
-  emits: ['selectDate', 'selectTime'],
+  emits: ['selectDate', 'selectTime', 'submitDateTime'],
   data() {
     const today = new Date();
     return {
@@ -48,14 +48,6 @@ window.DateTimePicker = {
   },
   template: `
     <div class="datetime-picker-wrap">
-      <!-- Date Badge Display -->
-      <div v-if="selectedDate && selectedTime" class="selected-datetime-badge">
-        <div class="badge-content">
-          <span class="badge-label">Sua escolha:</span>
-          <span class="badge-datetime">{{ formatDateLong(selectedDate).replace(/de /g, '') }}&nbsp;às&nbsp;{{ selectedTime }}</span>
-        </div>
-      </div>
-
       <!-- Day Badges -->
       <div class="days-selector-title">SELECIONE O DIA E HORÁRIO:</div>
       <div class="days-badges-wrap">
@@ -83,13 +75,29 @@ window.DateTimePicker = {
       <!-- Time Slots -->
       <div v-if="selectedDate" class="slots-wrap">
         <div
-          v-for="(s, i) in timeSlots"
+          v-for="(s, i) in timeSlots.filter(s => !s.full)"
           :key="s.time"
           class="slot"
-          :class="{ selected: selectedTime === s.time, full: s.full, disabled: locked && selectedTime !== s.time }"
+          :class="{ selected: selectedTime === s.time, disabled: locked && selectedTime !== s.time }"
           :style="{ animationDelay: (i * 0.04) + 's' }"
-          @click="!s.full && !locked && $emit('selectTime', s.time)"
+          @click="!locked && $emit('selectTime', s.time)"
         >{{ s.time }}</div>
+      </div>
+      <div v-if="selectedDate" class="selected-choice-summary">
+        <div class="selected-datetime-badge">
+          <div class="badge-content">
+            <span class="badge-label">Sua escolha:</span>
+            <span class="badge-datetime">{{ formatDateLong(selectedDate).replace(/de /g, '') }}&nbsp;às&nbsp;{{ selectedTime || '---' }}</span>
+          </div>
+        </div>
+      </div>
+      <div v-if="selectedDate" class="datetime-submit-wrap">
+        <button
+          type="button"
+          class="send-time-btn"
+          :disabled="!selectedTime || locked"
+          @click="!locked && selectedTime && $emit('submitDateTime')"
+        >Enviar</button>
       </div>
     </div>
   `

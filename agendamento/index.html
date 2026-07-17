@@ -190,7 +190,7 @@
           return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
         }
         function fmtDateShort(d) {
-          return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
+          return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'short' }).replace('.', '');
         }
 
         /* ---------- FLOW ---------- */
@@ -292,14 +292,22 @@
         async function selectTime(time) {
           if (stage.value !== 'datetime') return;
           booking.time = time;
-          if (booking.date && booking.time) {
-            // Date and time both selected, move to summary
-            await botSay('Perfeito, confere se está tudo certo:', { widget: 'summary', delay: 800 });
-            stage.value = 'summary';
-          }
+        }
+
+        async function submitDateTime() {
+          if (stage.value !== 'datetime') return;
+          if (!booking.date || !booking.time) return;
+          dismissLatestWidget();
+          const choiceLabel = `${fmtDate(booking.date)} às ${booking.time}`;
+          pushUser(choiceLabel);
+          await botSay('Perfeito, confere se está tudo certo:', { widget: 'summary', delay: 800 });
+          stage.value = 'summary';
         }
 
         async function confirmBooking() {
+          dismissLatestWidget();
+          await nextTick();
+          await new Promise(r => setTimeout(r, 1500));
           pushUser('Confirmar agendamento ✅');
           await botSay('Agendamento confirmado! Te espero lá 💈', { widget: 'success', delay: 900 });
           stage.value = 'done';
@@ -334,9 +342,10 @@
           booking, customer, stage, timeSlots,
           nameInput, phoneInput,
           submitName, submitPhone,
-          toggleService, sendServices, selectBarber, selectDate, selectTime,
+          toggleService, sendServices, selectBarber, selectDate, selectTime, submitDateTime,
           confirmBooking, restart,
           fmtDate, fmtDateShort,
+          totalPrice,
           SERVICES, BARBERS,
           menuOpen, menuEl, menuBtnEl, toggleMenu, closeMenu,
           onMenuEnter, onMenuLeave, goToBookings, restartFromMenu,
@@ -468,10 +477,12 @@
               :locked="stage !== 'datetime'"
               @selectDate="selectDate"
               @selectTime="selectTime"
+              @submitDateTime="submitDateTime"
             />
 
-            <div class="summary-card" v-if="m.widget === 'summary'">
-              <div class="summary-title"><i class="ri-file-list-3-line"></i>Resumo do agendamento</div>
+            <transition name="widget-fade">
+              <div class="summary-card" v-if="m.widget === 'summary'">
+                <div class="summary-title"><i class="ri-file-list-3-line"></i>Resumo do agendamento</div>
               <div class="summary-row">
                 <span class="label"><i class="ri-scissors-2-line"></i>Serviços</span>
                 <span class="value">{{ booking.services.map(s => s.name).join(', ') }}</span>
@@ -504,13 +515,17 @@
                 <i class="ri-checkbox-circle-fill"></i> Confirmar agendamento
               </button>
             </div>
+            </transition>
 
             <div class="success-card" v-if="m.widget === 'success'">
               <div class="success-icon"><i class="ri-check-line"></i></div>
               <div class="success-title">Tudo certo!</div>
               <div class="success-sub">
-                {{ booking.services.map(s => s.name).join(', ') }} com {{ booking.barber?.name }}<br>
-                {{ fmtDateShort(booking.date) }} às {{ booking.time }}
+                Seu agendamento de {{ booking.services.map(s => s.name).join(', ') }} com {{ booking.barber?.name }} foi confirmado.<br>
+                <span class="success-datetime">{{ fmtDateShort(booking.date) }} às {{ booking.time }}</span>
+              </div>
+              <div class="success-image-wrap">
+                <img src="./img/finalize.png" alt="Agendamento confirmado" />
               </div>
               <button class="confirm-btn" style="margin-top:16px;background:transparent;border:1px solid var(--line-strong);box-shadow:none" @click="restart">
                 <i class="ri-add-line"></i> Novo agendamento
