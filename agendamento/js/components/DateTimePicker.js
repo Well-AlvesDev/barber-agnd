@@ -1,0 +1,96 @@
+window.DateTimePicker = {
+  props: ['selectedDate', 'selectedTime', 'timeSlots', 'locked'],
+  emits: ['selectDate', 'selectTime'],
+  data() {
+    const today = new Date();
+    return {
+      today,
+      daysOfWeek: ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'],
+      monthsShort: ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ']
+    };
+  },
+  computed: {
+    availableDays() {
+      const days = [];
+      // Generate next 14 days
+      for (let i = 0; i < 14; i++) {
+        const date = new Date(this.today);
+        date.setDate(date.getDate() + i);
+
+        const isSunday = date.getDay() === 0;
+
+        if (!isSunday) {
+          days.push({
+            day: date.getDate(),
+            date,
+            month: this.monthsShort[date.getMonth()],
+            dayOfWeek: this.daysOfWeek[date.getDay()],
+            isToday: date.toDateString() === this.today.toDateString(),
+          });
+        }
+      }
+      const visibleDays = days.slice(0, 5);
+      visibleDays.forEach((day, index) => {
+        if (index >= 3) {
+          day.unavailable = true;
+        }
+      });
+      return visibleDays;
+    }
+  },
+  methods: {
+    isSelected(day) {
+      return this.selectedDate && day.date.toDateString() === this.selectedDate.toDateString();
+    },
+    formatDateLong(date) {
+      return date.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+    }
+  },
+  template: `
+    <div class="datetime-picker-wrap">
+      <!-- Date Badge Display -->
+      <div v-if="selectedDate && selectedTime" class="selected-datetime-badge">
+        <div class="badge-content">
+          <span class="badge-label">Sua escolha:</span>
+          <span class="badge-datetime">{{ formatDateLong(selectedDate).replace(/de /g, '') }}&nbsp;às&nbsp;{{ selectedTime }}</span>
+        </div>
+      </div>
+
+      <!-- Day Badges -->
+      <div class="days-selector-title">SELECIONE O DIA E HORÁRIO:</div>
+      <div class="days-badges-wrap">
+        <div
+          v-for="(day, i) in availableDays"
+          :key="day.date.toISOString()"
+          class="day-badge"
+          :class="{ selected: isSelected(day), disabled: (locked && !isSelected(day)) || day.unavailable, unavailable: day.unavailable }"
+          :style="{ animationDelay: (i * 0.05) + 's' }"
+          @click="!locked && !day.unavailable && $emit('selectDate', day.date)"
+        >
+          <div class="day-badge-dow">{{ day.dayOfWeek }}</div>
+          <div class="day-badge-date">{{ day.day }}</div>
+          <div class="day-badge-month">{{ day.month.toUpperCase() }}</div>
+        </div>
+        <div class="arrow-scroll">
+          <i class="ri-arrow-right-line"></i>
+        </div>
+      </div>
+      <div class="days-badges-hint">
+        <span>Deslize para ver mais</span>
+        <i class="ri-arrow-right-line"></i>
+      </div>
+
+      <!-- Time Slots -->
+      <div v-if="selectedDate" class="slots-wrap">
+        <div
+          v-for="(s, i) in timeSlots"
+          :key="s.time"
+          class="slot"
+          :class="{ selected: selectedTime === s.time, full: s.full, disabled: locked && selectedTime !== s.time }"
+          :style="{ animationDelay: (i * 0.04) + 's' }"
+          @click="!s.full && !locked && $emit('selectTime', s.time)"
+        >{{ s.time }}</div>
+      </div>
+    </div>
+  `
+};

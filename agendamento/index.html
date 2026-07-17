@@ -28,6 +28,7 @@
   <script src="./js/components/ServiceGrid.js"></script>
   <script src="./js/components/BarberRow.js"></script>
   <script src="./js/components/CalendarPicker.js"></script>
+  <script src="./js/components/DateTimePicker.js"></script>
   <script src="./js/components/TimeSlots.js"></script>
 
   <script>
@@ -61,6 +62,7 @@
         ServiceGrid: window.ServiceGrid,
         BarberRow: window.BarberRow,
         CalendarPicker: window.CalendarPicker,
+        DateTimePicker: window.DateTimePicker,
         TimeSlots: window.TimeSlots,
       },
 
@@ -139,7 +141,7 @@
           phone: '',
         });
 
-        const stage = ref('greeting'); // greeting -> name -> phone -> service -> barber -> date -> time -> summary -> done
+        const stage = ref('greeting'); // greeting -> name -> phone -> service -> barber -> datetime -> summary -> done
 
         let msgId = 0;
         function nowLabel() {
@@ -256,8 +258,8 @@
 
           if (BARBERS.length === 1) {
             booking.barber = BARBERS[0];
-            await botSay(`Boa escolha. ${BARBERS[0].name} será seu barbeiro. Agora escolhe o dia que fica melhor pra você:`, { widget: 'calendar', delay: 800 });
-            stage.value = 'date';
+            await botSay(`Boa escolha. ${BARBERS[0].name} será seu barbeiro. Agora escolhe o dia e horário:`, { widget: 'datetime', delay: 800 });
+            stage.value = 'datetime';
             return;
           }
 
@@ -269,32 +271,32 @@
           if (stage.value !== 'barber') return;
           booking.barber = barber;
           pushUser(barber.name);
-          await botSay('Show! Agora escolhe o dia que fica melhor pra você:', { widget: 'calendar', delay: 800 });
-          stage.value = 'date';
+          await botSay('Show! Agora escolhe o dia e horário:', { widget: 'datetime', delay: 800 });
+          stage.value = 'datetime';
         }
 
         async function selectDate(date) {
-          if (stage.value !== 'date') return;
+          if (stage.value !== 'datetime') return;
           booking.date = date;
-          booking.time = null;
-          pushUser(fmtDate(date));
-          await botSay('E qual horário funciona melhor?', { widget: 'time', delay: 800 });
-          stage.value = 'time';
+          await nextTick();
+          await scrollToBottom();
         }
 
         const timeSlots = computed(() => {
-          const base = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
-          return base.map((t, i) => ({ time: t, full: i === 2 || i === 6 }));
+          const base = ['08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30'];
+          return base.map((t, i) => ({ time: t, full: i === 5 || i === 14 }));
         });
 
         const totalPrice = computed(() => booking.services.reduce((sum, service) => sum + service.price, 0));
 
         async function selectTime(time) {
-          if (stage.value !== 'time') return;
+          if (stage.value !== 'datetime') return;
           booking.time = time;
-          pushUser(time);
-          await botSay('Perfeito, confere se está tudo certo:', { widget: 'summary', delay: 800 });
-          stage.value = 'summary';
+          if (booking.date && booking.time) {
+            // Date and time both selected, move to summary
+            await botSay('Perfeito, confere se está tudo certo:', { widget: 'summary', delay: 800 });
+            stage.value = 'summary';
+          }
         }
 
         async function confirmBooking() {
@@ -458,19 +460,14 @@
               @select="selectBarber"
             />
 
-            <CalendarPicker
-              v-if="m.widget === 'calendar'"
+            <DateTimePicker
+              v-if="m.widget === 'datetime'"
               :selectedDate="booking.date"
-              :locked="stage !== 'date'"
-              @select="selectDate"
-            />
-
-            <TimeSlots
-              v-if="m.widget === 'time'"
-              :slots="timeSlots"
               :selectedTime="booking.time"
-              :locked="stage !== 'time'"
-              @select="selectTime"
+              :timeSlots="timeSlots"
+              :locked="stage !== 'datetime'"
+              @selectDate="selectDate"
+              @selectTime="selectTime"
             />
 
             <div class="summary-card" v-if="m.widget === 'summary'">
