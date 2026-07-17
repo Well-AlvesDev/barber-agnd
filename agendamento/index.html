@@ -524,12 +524,12 @@
                 Seu agendamento de {{ booking.services.map(s => s.name).join(', ') }} com {{ booking.barber?.name }} foi confirmado.<br>
                 <span class="success-datetime">{{ fmtDateShort(booking.date) }} às {{ booking.time }}</span>
               </div>
-              <div class="success-image-wrap">
-                <img src="./img/finalize.png" alt="Agendamento confirmado" />
-              </div>
               <button class="confirm-btn" style="margin-top:16px;background:transparent;border:1px solid var(--line-strong);box-shadow:none" @click="restart">
                 <i class="ri-add-line"></i> Novo agendamento
               </button>
+              <div class="success-image-wrap">
+                <img src="./img/finalize.png" alt="Agendamento confirmado" />
+              </div>
             </div>
 
           </template>
