@@ -284,7 +284,25 @@
 
         const timeSlots = computed(() => {
           const base = ['08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30'];
-          return base.map((t, i) => ({ time: t, full: i === 5 || i === 14 }));
+          const slots = base.map((t, i) => ({ time: t, full: i === 5 || i === 14 }));
+
+          if (!booking.date) {
+            return slots;
+          }
+
+          const now = new Date();
+          const isToday = booking.date.toDateString() === now.toDateString();
+
+          if (!isToday) {
+            return slots;
+          }
+
+          return slots.filter(slot => {
+            const [hours, minutes] = slot.time.split(':').map(Number);
+            const slotDate = new Date(now);
+            slotDate.setHours(hours, minutes, 0, 0);
+            return slotDate > now;
+          });
         });
 
         const totalPrice = computed(() => booking.services.reduce((sum, service) => sum + service.price, 0));
@@ -361,7 +379,7 @@
           <i class="ri-arrow-left-line"></i>
         </a>
         <div class="logo-wrap">
-          <img src="../../logo.png" alt="Lukiinha Cortes Logo" class="logo-image">
+          <img src="../../logo.webp" alt="Lukiinha Cortes Logo" class="logo-image">
           <div class="status-indicator">
             <span class="status-dot-inline"></span>
             <transition name="fade" mode="out-in">
@@ -528,7 +546,7 @@
                 <i class="ri-add-line"></i> Novo agendamento
               </button>
               <div class="success-image-wrap">
-                <img src="./img/finalize.png" alt="Agendamento confirmado" />
+                <img src="./img/finalize.webp" alt="Agendamento confirmado" />
               </div>
             </div>
 

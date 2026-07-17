@@ -27,7 +27,7 @@ export const Hero = {
 
     // Deixe '' até ter a imagem real. Quando pronta, atribua a URL
     // (ex.: '/assets/hero-banner.jpg' ou uma URL de CDN/Supabase Storage).
-    const heroImageUrl = ref('/image.png');
+    const heroImageUrl = ref('/image.webp');
 
     const heroBgStyle = computed(() => {
       return heroImageUrl.value

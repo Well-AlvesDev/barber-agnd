@@ -15,7 +15,7 @@ export const BrandMark = {
   name: 'BrandMark',
   props: {
     loading: { type: Boolean, default: false },
-    logoSrc: { type: String, default: '/logo.png' },
+    logoSrc: { type: String, default: '/logo.webp' },
     altText: { type: String, default: 'Lukinha Cortes' }
   },
   template: `

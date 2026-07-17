@@ -60,7 +60,7 @@ window.DateTimePicker = {
           @click="!locked && !day.unavailable && $emit('selectDate', day.date)"
         >
           <div class="day-badge-dow">{{ day.dayOfWeek }}</div>
-          <div class="day-badge-date">{{ day.day }}</div>
+          <div class="day-badge-date">{{ day.isToday ? 'Hoje' : day.day }}</div>
           <div class="day-badge-month">{{ day.month.toUpperCase() }}</div>
         </div>
         <div class="arrow-scroll">
