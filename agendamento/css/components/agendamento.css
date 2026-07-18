@@ -1,13 +1,13 @@
 /* Extracted styles from agendamento/index.html */
 /* ============ TOKENS ============ */
 :root {
-    --bg: #0A0B0F;
+    --bg: #2c3146;
     --surface: #14161F;
     --surface-2: #1B1E29;
     --line: rgba(255, 255, 255, 0.07);
     --line-strong: rgba(255, 255, 255, 0.14);
 
-    --blue-500: #2F5FF0;
+    --blue-500: #2548b1;
     --blue-600: #1E4FD8;
     --blue-glow: rgba(47, 95, 240, 0.35);
 
@@ -689,13 +689,26 @@ body {
     gap: 12px;
     margin: 8px 0 14px 34px;
     overflow-x: auto;
-    padding-bottom: 4px;
+    padding-bottom: 12px;
     scroll-behavior: smooth;
 }
 
 .service-grid::-webkit-scrollbar {
     width: 0;
-    height: 0;
+    height: 6px;
+}
+
+.service-grid::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.service-grid::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+}
+
+.service-grid::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
 }
 
 .service-card {
@@ -788,6 +801,22 @@ body {
 .service-card.selected .s-name,
 .service-card.selected .s-price {
     color: #fff;
+}
+
+.service-grid-hint {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+    margin: 2px 34px 12px 0;
+    padding-right: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
+}
+
+.service-grid-hint i {
+    font-size: 14px;
 }
 
 /* barber picker */
@@ -923,7 +952,7 @@ body {
 .slot {
     padding: 9px 13px;
     border-radius: var(--radius-sm);
-    background: #383737;
+    background: #212020;
     border: 1px solid var(--line);
     font-size: 13px;
     font-weight: 600;
@@ -948,6 +977,19 @@ body {
     opacity: 0.35;
     text-decoration: line-through;
     pointer-events: none;
+}
+
+.no-slots-message {
+    padding: 12px 14px;
+    margin: 8px 0 14px 0;
+    border-radius: var(--radius-sm);
+    background: rgba(232, 54, 46, 0.08);
+    border: 1px solid rgba(232, 54, 46, 0.25);
+    color: var(--text-dim);
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    animation: chip-in 0.38s var(--ease-spring) forwards;
 }
 
 .datetime-submit-wrap {
@@ -1439,27 +1481,40 @@ body {
     gap: 10px;
     margin-bottom: 14px;
     overflow-x: auto;
-    padding-bottom: 4px;
+    padding-bottom: 12px;
     scroll-behavior: smooth;
     position: relative;
 }
 
 .days-badges-wrap::-webkit-scrollbar {
     width: 0;
-    height: 0;
+    height: 6px;
+}
+
+.days-badges-wrap::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.days-badges-wrap::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+}
+
+.days-badges-wrap::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
 }
 
 .day-badge {
     flex-shrink: 0;
-    width: 76px;
-    padding: 12px 8px;
+    width: 92px;
+    padding: 14px 10px;
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: var(--radius-md);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     cursor: pointer;
     transition: all 0.15s var(--ease-soft);
     opacity: 0;
@@ -1500,7 +1555,7 @@ body {
 }
 
 .day-badge-dow {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     color: var(--text-faint);
     text-transform: uppercase;
@@ -1508,13 +1563,13 @@ body {
 }
 
 .day-badge-date {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--text);
 }
 
 .day-badge-month {
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 700;
     color: var(--text-dim);
     text-transform: uppercase;
@@ -1539,12 +1594,13 @@ body {
 }
 
 .days-badges-hint {
-    display: inline-flex;
+    display: flex;
+    justify-content: flex-end;
     align-items: center;
     gap: 6px;
-    margin-top: 2px;
+    margin-top: -6px;
     margin-bottom: 12px;
-    padding-left: 4px;
+    padding-right: 14px;
     font-size: 12px;
     font-weight: 600;
     color: var(--text-dim);

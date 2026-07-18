@@ -73,7 +73,7 @@ window.DateTimePicker = {
       </div>
 
       <!-- Time Slots -->
-      <div v-if="selectedDate" class="slots-wrap">
+      <div v-if="selectedDate && timeSlots.filter(s => !s.full).length > 0" class="slots-wrap">
         <div
           v-for="(s, i) in timeSlots.filter(s => !s.full)"
           :key="s.time"
@@ -82,6 +82,9 @@ window.DateTimePicker = {
           :style="{ animationDelay: (i * 0.04) + 's' }"
           @click="!locked && $emit('selectTime', s.time)"
         >{{ s.time }}</div>
+      </div>
+      <div v-if="selectedDate && timeSlots.filter(s => !s.full).length === 0" class="no-slots-message">
+        Todos os horários foram ocupados nessa data
       </div>
       <div v-if="selectedDate" class="selected-choice-summary">
         <div class="selected-datetime-badge">
