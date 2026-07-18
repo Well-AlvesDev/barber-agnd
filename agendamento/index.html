@@ -77,6 +77,7 @@
         const menuOpen = ref(false);
         const menuEl = ref(null);
         const menuBtnEl = ref(null);
+        const hasScrolledToSlots = ref(false);
 
         function toggleMenu() {
           menuOpen.value = !menuOpen.value;
@@ -279,7 +280,10 @@
           if (stage.value !== 'datetime') return;
           booking.date = date;
           await nextTick();
-          await scrollToBottom();
+          if (!hasScrolledToSlots.value && scrollEl.value) {
+            hasScrolledToSlots.value = true;
+            scrollEl.value.scrollBy({ top: 330, behavior: 'smooth' });
+          }
         }
 
         const timeSlots = computed(() => {
@@ -343,6 +347,7 @@
           customer.phone = '';
           nameInput.value = '';
           phoneInput.value = '';
+          hasScrolledToSlots.value = false;
           stage.value = 'greeting';
           startFlow();
         }

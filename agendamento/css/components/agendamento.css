@@ -950,12 +950,12 @@ body {
 }
 
 .slot {
-    padding: 9px 13px;
+    padding: 12px 18px;
     border-radius: var(--radius-sm);
     background: #212020;
     border: 1px solid var(--line);
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 18px;
+    font-weight: 400;
     color: var(--text);
     cursor: pointer;
     transition: all 0.15s var(--ease-soft);
