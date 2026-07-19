@@ -63,9 +63,6 @@ window.DateTimePicker = {
           <div class="day-badge-date">{{ day.isToday ? 'Hoje' : day.day }}</div>
           <div class="day-badge-month">{{ day.month.toUpperCase() }}</div>
         </div>
-        <div class="arrow-scroll">
-          <i class="ri-arrow-right-line"></i>
-        </div>
       </div>
       <div class="days-badges-hint">
         <span>Deslize para ver mais</span>

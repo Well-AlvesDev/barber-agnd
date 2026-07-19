@@ -255,18 +255,10 @@
 
         function formatPhoneValue(raw) {
           const digits = raw.replace(/\D/g, '').slice(0, 11);
-          if (digits.length <= 4) return digits;
-          if (digits.length < 9) {
-            return `${digits.slice(0, -4)}-${digits.slice(-4)}`;
-          }
+          if (digits.length <= 2) return digits;
 
-          let normalized = digits;
-          if (digits.length === 10 && digits[2] !== '9') {
-            normalized = digits.slice(0, 2) + '9' + digits.slice(2);
-          }
-
-          const area = normalized.slice(0, 2);
-          const local = normalized.slice(2);
+          const area = digits.slice(0, 2);
+          const local = digits.slice(2);
 
           if (local.length <= 4) {
             return `(${area}) ${local}`;
@@ -274,7 +266,7 @@
           if (local.length <= 8) {
             return `(${area}) ${local.slice(0, 4)}-${local.slice(4)}`;
           }
-          return `(${area}) ${local.slice(0, 5)}-${local.slice(5, 9)}`;
+          return `(${area}) ${local.slice(0, 5)}-${local.slice(5)}`;
         }
 
         let phoneErrorTimeout = null;
@@ -455,7 +447,7 @@
           loadingShell, starting, messages, isTyping, scrollEl,
           booking, customer, stage, timeSlots,
           nameInput, phoneInput, phoneError,
-          submitName, submitPhone,
+          submitName, submitPhone, onPhoneInput,
           toggleService, sendServices, selectBarber, selectDate, selectTime, submitDateTime,
           confirmBooking, restart,
           fmtDate, fmtDateShort,
