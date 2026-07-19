@@ -267,10 +267,18 @@
         }
 
         function onPhoneInput(event) {
-          const formatted = formatPhoneValue(event.target.value);
-          event.target.value = formatted;
-          phoneInput.value = formatted;
-          if (formatted.replace(/\D/g, '').length >= 10) {
+          const digits = event.target.value.replace(/\D/g, '');
+          if (digits.length > 11) {
+            const limited = digits.slice(0, 11);
+            const formatted = formatPhoneValue(limited);
+            event.target.value = formatted;
+            phoneInput.value = formatted;
+          } else {
+            const formatted = formatPhoneValue(event.target.value);
+            event.target.value = formatted;
+            phoneInput.value = formatted;
+          }
+          if (event.target.value.replace(/\D/g, '').length >= 10) {
             phoneError.value = '';
           }
         }
@@ -523,7 +531,10 @@
             <form v-if="m.widget === 'phoneInput'" class="inline-form" @submit.prevent="submitPhone">
 
               <div class="inline-input-row">
-                <input id="customer-phone" v-model="phoneInput" @input="onPhoneInput" type="tel" inputmode="tel" placeholder="Seu número de telefone" autocomplete="off" spellcheck="false" required>
+                <div class="phone-input-wrapper">
+                  <span class="phone-flag"><img src="./img/Flag_of_Brazil.svg.webp" alt="Brasil"></span>
+                  <input id="customer-phone" v-model="phoneInput" @input="onPhoneInput" type="tel" inputmode="tel" placeholder="(11) 99999-9999" autocomplete="off" spellcheck="false" maxlength="17" required>
+                </div>
                 <button type="submit" class="inline-submit-btn">Enviar</button>
               </div>              <p v-if="phoneError" class="input-error-message">{{ phoneError }}</p>            </form>
 

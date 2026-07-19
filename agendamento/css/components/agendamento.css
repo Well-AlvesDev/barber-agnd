@@ -1,7 +1,7 @@
 /* Extracted styles from agendamento/index.html */
 /* ============ TOKENS ============ */
 :root {
-    --bg: #121212;
+    --bg: #101010;
     --surface: #14161F;
     --surface-2: #1B1E29;
     --line: rgba(255, 255, 255, 0.07);
@@ -57,31 +57,9 @@ body {
 }
 
 /* ============ LAYOUT SHELL ============ */
-.shell {
-    position: relative;
-    max-width: 460px;
-    margin: 0 auto;
-    height: 100dvh;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background:
-        radial-gradient(120% 60% at 15% 0%, rgba(232, 54, 46, 0.10), transparent 55%),
-        radial-gradient(120% 60% at 100% 10%, rgba(47, 95, 240, 0.14), transparent 55%),
-        var(--bg);
-    overflow: hidden;
-    isolation: isolate;
-}
 
-/* subtle grain/vignette to match the moody banner */
-.shell::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(120% 70% at 50% 100%, rgba(0, 0, 0, 0.55), transparent 60%);
-    z-index: 0;
-}
+
+
 
 /* ============ HEADER ============ */
 .chat-header {
@@ -488,8 +466,11 @@ body {
 .bubble.bot {
     background: linear-gradient(180deg, #182c84, #132153);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #fff;
+    color: #e6e6e6;
     border-radius: 4px 18px 18px 18px;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.01em;
 }
 
 .bubble.user {
@@ -640,13 +621,33 @@ body {
     gap: 12px;
 }
 
+.phone-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.phone-flag {
+    position: absolute;
+    left: 16px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.phone-flag img {
+    width: 24px;
+    height: 16px;
+    object-fit: contain;
+}
+
 .inline-input-row input {
     width: 100%;
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 18px;
     background: rgba(255, 255, 255, 0.06);
     color: #fff;
-    padding: 16px 18px;
+    padding: 16px 18px 16px 48px;
     font-size: 15px;
     outline: none;
     min-height: 52px;
@@ -682,8 +683,8 @@ body {
     width: 100%;
     border: 0;
     border-radius: 18px;
-    background: linear-gradient(155deg, #757575, #464646);
-    color: #ebebeb;
+    background: linear-gradient(155deg, #787878, #414141);
+    color: #d2d2d2;
     padding: 16px 18px;
     font-size: 15px;
     font-weight: 400;
@@ -693,6 +694,7 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    font-family: 'Inter', sans-serif;
 }
 
 .inline-submit-btn:hover {
@@ -757,7 +759,8 @@ body {
     animation: chip-in 0.42s var(--ease-spring) forwards;
     display: flex;
     flex-direction: column;
-    min-height: 196px;
+    min-height: 220px;
+    position: relative;
 }
 
 .service-card:active {
@@ -765,13 +768,13 @@ body {
 }
 
 .service-card.selected {
-    background: #133575;
+    background: rgba(19, 53, 117, 0.9);
     border-color: var(--blue-500);
     box-shadow: 0 24px 60px -34px rgba(47, 95, 240, 0.8);
 }
 
 .service-card.selected .service-details {
-    background: transparent;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(19, 53, 117, 0.9));
 }
 
 .service-card.disabled {
@@ -780,8 +783,9 @@ body {
 }
 
 .service-card .service-image {
-    position: relative;
-    min-height: 136px;
+    position: absolute;
+    inset: 0;
+    min-height: 100%;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -798,9 +802,12 @@ body {
     padding: 14px 14px 16px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 10px;
     flex: 1;
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7));
 }
 
 .service-card .s-name {
@@ -826,9 +833,10 @@ body {
 }
 
 .service-card .s-price {
-    font-weight: 700;
+    font-weight: 400;
     color: var(--text);
     font-family: 'Inter', sans-serif;
+    font-size: 20px;
 }
 
 .service-card.selected .s-name,
@@ -837,19 +845,27 @@ body {
 }
 
 .service-grid-hint {
+    position: relative;
     display: flex;
     justify-content: flex-end;
     align-items: center;
     gap: 6px;
-    margin: 2px 34px 12px 0;
+    margin: -10px 2px 12px 0;
     padding-right: 4px;
     font-size: 12px;
     font-weight: 600;
     color: var(--text-dim);
 }
 
-.service-grid-hint i {
-    font-size: 14px;
+.service-grid-hint::before {
+    content: '';
+    position: absolute;
+    left: 34px;
+    right: 12px;
+    top: 50%;
+    height: 1px;
+    background: var(--line);
+    z-index: -1;
 }
 
 /* barber picker */
@@ -1189,26 +1205,32 @@ body {
 
 .send-services-btn {
     width: 100%;
-    max-width: 320px;
-    padding: 14px 20px;
-    border: none;
-    border-radius: 14px;
-    background: linear-gradient(155deg, var(--blue-500), var(--blue-600));
-    color: #fff;
-    font-weight: 700;
+    border: 0;
+    border-radius: 18px;
+    background: linear-gradient(155deg, #787878, #414141);
+    color: #d2d2d2;
+    padding: 16px 18px;
     font-size: 15px;
+    font-weight: 400;
     cursor: pointer;
-    box-shadow: 0 4px 16px -4px var(--blue-glow);
-    transition: transform 0.15s var(--ease-soft), box-shadow 0.2s var(--ease-soft);
+    box-shadow: 0 14px 36px -20px rgba(0, 0, 0, 0.45);
+    transition: transform 0.15s var(--ease-soft), opacity 0.2s var(--ease-soft);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+}
+
+.send-services-btn:hover {
+    opacity: 0.96;
 }
 
 .send-services-btn:active {
-    transform: scale(0.97);
+    transform: scale(0.98);
 }
 
 .send-services-btn:disabled {
     opacity: 0.45;
-    box-shadow: none;
     pointer-events: none;
 }
 
@@ -1630,20 +1652,28 @@ body {
 }
 
 .days-badges-hint {
+    position: relative;
     display: flex;
     justify-content: flex-end;
     align-items: center;
     gap: 6px;
     margin-top: -6px;
     margin-bottom: 12px;
-    padding-right: 14px;
+    padding-right: 8px;
     font-size: 12px;
     font-weight: 600;
     color: var(--text-dim);
 }
 
-.days-badges-hint i {
-    font-size: 14px;
+.days-badges-hint::before {
+    content: '';
+    position: absolute;
+    left: 34px;
+    right: 12px;
+    top: 50%;
+    height: 1px;
+    background: var(--line);
+    z-index: -1;
 }
 
 @keyframes slide-hint {
