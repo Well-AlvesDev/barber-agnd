@@ -46,6 +46,14 @@ body {
     height: 100%;
 }
 
+/* Ensure shell fills viewport and uses flex layout so .messages can scroll */
+.shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    height: 100%;
+}
+
 ::-webkit-scrollbar {
     width: 0;
     height: 0;
@@ -390,6 +398,7 @@ body {
     flex-direction: column;
     gap: 2px;
     scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
 }
 
 .day-divider {

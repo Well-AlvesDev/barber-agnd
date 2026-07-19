@@ -159,6 +159,24 @@
           }
         }
 
+        function scrollElementIntoViewInContainer(container, element, position = 'center') {
+          if (!container || !element) return;
+          try {
+            const elRect = element.getBoundingClientRect();
+            const contRect = container.getBoundingClientRect();
+            const elTopRelative = elRect.top - contRect.top + container.scrollTop;
+            let desiredTop;
+            if (position === 'top') {
+              desiredTop = elTopRelative - 12;
+            } else { // center
+              desiredTop = elTopRelative - (container.clientHeight / 2) + (element.clientHeight / 2);
+            }
+            container.scrollTo({ top: Math.max(0, Math.min(desiredTop, container.scrollHeight)), behavior: 'smooth' });
+          } catch (err) {
+            // fail silently
+          }
+        }
+
         function pushBot(text, opts = {}) {
           messages.value.push({
             id: ++msgId,
@@ -228,6 +246,11 @@
 
           await botSay('Perfeito! Agora me diz seu número de telefone para te avisar sobre o agendamento.', { widget: 'phoneInput', delay: 800 });
           stage.value = 'phone';
+          await nextTick();
+          // garantir que o input de telefone fique bem visível (topo ou centro)
+          const phoneEl = document.getElementById('customer-phone');
+          // preferimos posicionar levemente abaixo do topo para melhor visibilidade em mobile
+          scrollElementIntoViewInContainer(scrollEl.value, phoneEl, 'top');
         }
 
         function formatPhoneValue(raw) {
@@ -532,7 +555,7 @@
 
               <div class="inline-input-row">
                 <div class="phone-input-wrapper">
-                  <span class="phone-flag"><img src="./img/Flag_of_Brazil.svg.webp" alt="Brasil"></span>
+                  <span class="phone-flag"><img src="./img/brasil-flag.png" alt="Brasil"></span>
                   <input id="customer-phone" v-model="phoneInput" @input="onPhoneInput" type="tel" inputmode="tel" placeholder="(11) 99999-9999" autocomplete="off" spellcheck="false" maxlength="17" required>
                 </div>
                 <button type="submit" class="inline-submit-btn">Enviar</button>
