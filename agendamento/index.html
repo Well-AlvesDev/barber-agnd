@@ -76,6 +76,7 @@
         const scrollEl = ref(null);
         const nameInput = ref('');
         const phoneInput = ref('');
+        const phoneError = ref('');
         const menuOpen = ref(false);
         const menuEl = ref(null);
         const menuBtnEl = ref(null);
@@ -231,7 +232,10 @@
 
         function formatPhoneValue(raw) {
           const digits = raw.replace(/\D/g, '').slice(0, 11);
-          if (digits.length <= 2) return digits;
+          if (digits.length <= 4) return digits;
+          if (digits.length < 9) {
+            return `${digits.slice(0, -4)}-${digits.slice(-4)}`;
+          }
 
           let normalized = digits;
           if (digits.length === 10 && digits[2] !== '9') {
@@ -250,13 +254,42 @@
           return `(${area}) ${local.slice(0, 5)}-${local.slice(5, 9)}`;
         }
 
+        let phoneErrorTimeout = null;
+
+        function clearPhoneErrorAfterDelay() {
+          if (phoneErrorTimeout) {
+            clearTimeout(phoneErrorTimeout);
+          }
+          phoneErrorTimeout = setTimeout(() => {
+            phoneError.value = '';
+            phoneErrorTimeout = null;
+          }, 5000);
+        }
+
         function onPhoneInput(event) {
-          phoneInput.value = formatPhoneValue(event.target.value);
+          const formatted = formatPhoneValue(event.target.value);
+          event.target.value = formatted;
+          phoneInput.value = formatted;
+          if (formatted.replace(/\D/g, '').length >= 10) {
+            phoneError.value = '';
+          }
         }
 
         async function submitPhone() {
           const value = phoneInput.value.trim();
           if (!value) return;
+
+          const digits = value.replace(/\D/g, '');
+          if (digits.length < 8) {
+            phoneError.value = 'Número de telefone inválido';
+            clearPhoneErrorAfterDelay();
+            return;
+          }
+          if (digits.length < 10) {
+            phoneError.value = 'Número de telefone inválido, inclua o DDD';
+            clearPhoneErrorAfterDelay();
+            return;
+          }
 
           const formatted = formatPhoneValue(value);
           dismissLatestWidget();
@@ -390,7 +423,7 @@
         return {
           loadingShell, starting, messages, isTyping, scrollEl,
           booking, customer, stage, timeSlots,
-          nameInput, phoneInput,
+          nameInput, phoneInput, phoneError,
           submitName, submitPhone,
           toggleService, sendServices, selectBarber, selectDate, selectTime, submitDateTime,
           confirmBooking, restart,
@@ -488,12 +521,11 @@
             </form>
 
             <form v-if="m.widget === 'phoneInput'" class="inline-form" @submit.prevent="submitPhone">
-              <label class="inline-label" for="customer-phone">Telefone</label>
+
               <div class="inline-input-row">
-                <input id="customer-phone" v-model="phoneInput" @input="onPhoneInput" type="tel" inputmode="tel" placeholder="Ex.: (11) 9XXXX-XXXX" autocomplete="off" spellcheck="false" required>
+                <input id="customer-phone" v-model="phoneInput" @input="onPhoneInput" type="tel" inputmode="tel" placeholder="Seu número de telefone" autocomplete="off" spellcheck="false" required>
                 <button type="submit" class="inline-submit-btn">Enviar</button>
-              </div>
-            </form>
+              </div>              <p v-if="phoneError" class="input-error-message">{{ phoneError }}</p>            </form>
 
             <ServiceGrid
               v-if="m.widget === 'service'"

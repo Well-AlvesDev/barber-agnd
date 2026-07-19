@@ -671,6 +671,13 @@ body {
     color: #fff !important;
 }
 
+.input-error-message {
+    margin: 8px 0 0 0;
+    color: #ff5151;
+    font-size: 13px;
+    line-height: 1.35;
+}
+
 .inline-submit-btn {
     width: 100%;
     border: 0;
