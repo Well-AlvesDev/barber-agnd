@@ -43,6 +43,8 @@
       { id: 'sobrancelha', name: 'Sobrancelha', image: './img/sobrancelha.jpg', price: 5, duration: 10 },
     ];
 
+    const SHOP_NAME = 'Lukiinha Cortes';
+
     const BARBERS = [
       { id: 'luktinha', name: 'Lukiinha', role: 'Fundador', photo: '' }
     ];
@@ -199,9 +201,8 @@
         async function startFlow() {
           starting.value = true;
           try {
-            await botSay('Fala! Bem-vindo à Lukiinha Cortes 💈', { delay: 700 });
-            await botSay('Sou o assistente de agendamento. Vamos marcar seu horário em menos de 1 minuto.', { delay: 900 });
-            await botSay('Antes de tudo, me diz seu nome completo, por favor.', { widget: 'nameInput', delay: 700 });
+            await botSay(`Olá, tudo bem? Sou a assistente virtual do(a) ${SHOP_NAME} e cuido do agendamento dos serviços dos profissionais dele(a), ok?`, { delay: 700 });
+            await botSay('Qual o seu nome? Escreva seu nome e sobrenome, por favor.', { widget: 'nameInput', delay: 900 });
             stage.value = 'name';
           } finally {
             starting.value = false;
@@ -228,13 +229,39 @@
           stage.value = 'phone';
         }
 
+        function formatPhoneValue(raw) {
+          const digits = raw.replace(/\D/g, '').slice(0, 11);
+          if (digits.length <= 2) return digits;
+
+          let normalized = digits;
+          if (digits.length === 10 && digits[2] !== '9') {
+            normalized = digits.slice(0, 2) + '9' + digits.slice(2);
+          }
+
+          const area = normalized.slice(0, 2);
+          const local = normalized.slice(2);
+
+          if (local.length <= 4) {
+            return `(${area}) ${local}`;
+          }
+          if (local.length <= 8) {
+            return `(${area}) ${local.slice(0, 4)}-${local.slice(4)}`;
+          }
+          return `(${area}) ${local.slice(0, 5)}-${local.slice(5, 9)}`;
+        }
+
+        function onPhoneInput(event) {
+          phoneInput.value = formatPhoneValue(event.target.value);
+        }
+
         async function submitPhone() {
           const value = phoneInput.value.trim();
           if (!value) return;
 
+          const formatted = formatPhoneValue(value);
           dismissLatestWidget();
-          customer.phone = value;
-          pushUser(value);
+          customer.phone = formatted;
+          pushUser(formatted);
           phoneInput.value = '';
 
           await botSay('Ótimo! Agora vamos escolher o serviço.', { widget: 'service', delay: 800 });
@@ -454,18 +481,17 @@
             <!-- Inline widgets attached to a bot message. They stay visible after
                  a choice is made (showing the selection), but become inert. -->
             <form v-if="m.widget === 'nameInput'" class="inline-form" @submit.prevent="submitName">
-              <label class="inline-label" for="customer-name">Nome completo</label>
               <div class="inline-input-row">
-                <input id="customer-name" v-model="nameInput" type="text" placeholder="Ex.: João da Silva" autocomplete="name" required>
-                <button type="submit" class="inline-submit-btn"><i class="ri-arrow-right-line"></i></button>
+                <input id="customer-name" v-model="nameInput" type="text" placeholder="Seu nome e sobrenome" autocomplete="off" spellcheck="false" required>
+                <button type="submit" class="inline-submit-btn">Enviar</button>
               </div>
             </form>
 
             <form v-if="m.widget === 'phoneInput'" class="inline-form" @submit.prevent="submitPhone">
               <label class="inline-label" for="customer-phone">Telefone</label>
               <div class="inline-input-row">
-                <input id="customer-phone" v-model="phoneInput" type="tel" inputmode="tel" placeholder="Ex.: (11) 99999-9999" autocomplete="tel" required>
-                <button type="submit" class="inline-submit-btn"><i class="ri-arrow-right-line"></i></button>
+                <input id="customer-phone" v-model="phoneInput" @input="onPhoneInput" type="tel" inputmode="tel" placeholder="Ex.: (11) 9XXXX-XXXX" autocomplete="off" spellcheck="false" required>
+                <button type="submit" class="inline-submit-btn">Enviar</button>
               </div>
             </form>
 
