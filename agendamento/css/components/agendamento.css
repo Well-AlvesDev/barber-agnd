@@ -1010,8 +1010,8 @@ body {
 .slot {
     padding: 12px 18px;
     border-radius: var(--radius-sm);
-    background: #212020;
-    border: 1px solid var(--line);
+    background: #545457;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     font-size: 18px;
     font-weight: 400;
     color: var(--text);
@@ -1026,7 +1026,7 @@ body {
 }
 
 .slot.selected {
-    background: linear-gradient(155deg, var(--blue-500), var(--blue-600));
+    background: #183a9a;
     border-color: transparent;
     color: #fff;
 }
@@ -1623,8 +1623,8 @@ body {
 }
 
 .day-badge-dow {
-    font-size: 11px;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 400;
     color: #fff;
     text-transform: uppercase;
     letter-spacing: 0.05em;
