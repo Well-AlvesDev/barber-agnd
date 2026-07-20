@@ -1059,19 +1059,24 @@ body {
 .send-time-btn {
     width: 100%;
     max-width: 280px;
-    padding: 14px 20px;
-    border: none;
-    border-radius: 14px;
-    background: linear-gradient(155deg, var(--blue-500), var(--blue-600));
-    color: #fff;
-    font-weight: 700;
+    padding: 16px 18px;
+    border: 0;
+    border-radius: 18px;
+    background: linear-gradient(155deg, #787878, #414141);
+    color: #d2d2d2;
     font-size: 15px;
+    font-weight: 400;
     cursor: pointer;
-    box-shadow: 0 4px 16px -4px var(--blue-glow);
-    transition: transform 0.15s var(--ease-soft), box-shadow 0.2s var(--ease-soft);
+    box-shadow: 0 14px 36px -20px rgba(0, 0, 0, 0.45);
+    transition: transform 0.15s var(--ease-soft), opacity 0.2s var(--ease-soft);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
 }
 
-.send-time-btn:active {
+.send-time-btn:hover {
+    opacity: 0.96;
     transform: scale(0.97);
 }
 
