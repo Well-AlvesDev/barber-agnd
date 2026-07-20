@@ -1054,6 +1054,7 @@ body {
     margin: 10px 0 0;
     display: flex;
     justify-content: center;
+
 }
 
 .send-time-btn {
@@ -1706,6 +1707,36 @@ body {
     50% {
         transform: translateY(-50%) translateX(4px);
     }
+}
+
+/* ============ SUCCESS ACTIONS ============ */
+.success-actions {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0 12px 40px;
+    flex-wrap: wrap;
+}
+
+.success-action-btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 10px 16px;
+    background: linear-gradient(165deg, #888888 0%, #4e4e4e 100%);
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgb(231, 231, 231);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.success-action-btn:hover {
+    background: linear-gradient(135deg, #a0a0a0 0%, #707070 100%);
+}
+
+.success-action-btn:active {
+    transform: scale(0.98);
 }
 
 /* reduced motion */

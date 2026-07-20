@@ -145,7 +145,7 @@
           phone: '',
         });
 
-        const stage = ref('greeting'); // greeting -> name -> phone -> service -> barber -> datetime -> summary -> done
+        const stage = ref('greeting'); // greeting -> name -> service -> barber -> datetime -> phone -> done
 
         let msgId = 0;
         function nowLabel() {
@@ -244,13 +244,8 @@
           pushUser(value);
           nameInput.value = '';
 
-          await botSay('Perfeito! Agora me diz seu número de telefone para te avisar sobre o agendamento.', { widget: 'phoneInput', delay: 800 });
-          stage.value = 'phone';
-          await nextTick();
-          // garantir que o input de telefone fique bem visível (topo ou centro)
-          const phoneEl = document.getElementById('customer-phone');
-          // preferimos posicionar levemente abaixo do topo para melhor visibilidade em mobile
-          scrollElementIntoViewInContainer(scrollEl.value, phoneEl, 'top');
+          await botSay('Ótimo! Agora vamos escolher o serviço.', { widget: 'service', delay: 800 });
+          stage.value = 'service';
         }
 
         function formatPhoneValue(raw) {
@@ -320,8 +315,7 @@
           pushUser(formatted);
           phoneInput.value = '';
 
-          await botSay('Ótimo! Agora vamos escolher o serviço.', { widget: 'service', delay: 800 });
-          stage.value = 'service';
+          await confirmBooking();
         }
 
         function toggleService(service) {
@@ -420,15 +414,15 @@
           dismissLatestWidget();
           const choiceLabel = `${fmtDate(booking.date)} às ${booking.time}`;
           pushUser(choiceLabel);
-          await botSay('Perfeito, confere se está tudo certo:', { widget: 'summary', delay: 800 });
-          stage.value = 'summary';
+          await botSay('Perfeito! Agora me diz seu número de telefone para te avisar sobre o agendamento.', { widget: 'phoneInput', delay: 800 });
+          stage.value = 'phone';
+          await nextTick();
+          const phoneEl = document.getElementById('customer-phone');
+          scrollElementIntoViewInContainer(scrollEl.value, phoneEl, 'top');
         }
 
         async function confirmBooking() {
-          dismissLatestWidget();
-          await nextTick();
-          await new Promise(r => setTimeout(r, 1500));
-          pushUser('Confirmar agendamento ✅');
+          await new Promise(r => setTimeout(r, 800));
           await botSay('Agendamento confirmado! Te espero lá 💈', { widget: 'success', delay: 900 });
           stage.value = 'done';
         }
@@ -602,56 +596,33 @@
               @submitDateTime="submitDateTime"
             />
 
-            <transition name="widget-fade">
-              <div class="summary-card" v-if="m.widget === 'summary'">
-                <div class="summary-title"><i class="ri-scissors-fill"></i>Resumo do agendamento</div>
-              <div class="summary-row">
-                <span class="label"><i class="ri-scissors-2-line"></i>Serviços</span>
-                <span class="value">{{ booking.services.map(s => s.name).join(', ') }}</span>
-              </div>
-              <div class="summary-row">
-                <span class="label"><i class="ri-user-3-line"></i>Barbeiro</span>
-                <span class="value">{{ booking.barber?.name }}</span>
-              </div>
-              <div class="summary-row">
-                <span class="label"><i class="ri-user-3-line"></i>Cliente</span>
-                <span class="value">{{ customer.name }}</span>
-              </div>
-              <div class="summary-row">
-                <span class="label"><i class="ri-phone-line"></i>Telefone</span>
-                <span class="value">{{ customer.phone }}</span>
-              </div>
-              <div class="summary-row">
-                <span class="label"><i class="ri-calendar-check-line"></i>Data</span>
-                <span class="value" style="text-transform:capitalize">{{ fmtDate(booking.date) }}</span>
-              </div>
-              <div class="summary-row">
-                <span class="label"><i class="ri-time-line"></i>Horário</span>
-                <span class="value">{{ booking.time }}</span>
-              </div>
-              <div class="summary-total">
-                <span class="label">Total</span>
-                <span class="value">R$ {{ totalPrice }}</span>
-              </div>
-              <button class="confirm-btn" v-if="stage === 'summary'" @click="confirmBooking">
-                <i class="ri-checkbox-circle-fill"></i> Confirmar agendamento
-              </button>
-            </div>
-            </transition>
 
-            <div class="success-card" v-if="m.widget === 'success'">
-              <div class="success-icon"><i class="ri-check-line"></i></div>
-              <div class="success-title">Tudo certo!</div>
-              <div class="success-sub">
-                Seu agendamento de {{ booking.services.map(s => s.name).join(', ') }} com {{ booking.barber?.name }} foi confirmado.<br>
-                <span class="success-datetime">{{ fmtDateShort(booking.date) }} às {{ booking.time }}</span>
+
+            <div class="row bot" v-if="m.widget === 'success'">
+              <div class="row-avatar-spacer"></div>
+              <div class="bubble-col">
+                <div class="bubble bot" style="text-align: center;">
+                  <div style="font-size: 28px; margin-bottom: 8px;">✅</div>
+                  <div style="font-weight: 600; margin-bottom: 8px;">Tudo certo!</div>
+                  <div style="font-size: 14px; line-height: 1.4;">
+                    Seu agendamento de {{ booking.services.map(s => s.name).join(', ') }} com {{ booking.barber?.name }} foi confirmado.<br>
+                    <span style="font-size: 13px; opacity: 0.9;">{{ fmtDateShort(booking.date) }} às {{ booking.time }}</span>
+                  </div>
+                  <span class="meta-time">{{ m.time }}</span>
+                </div>
               </div>
-              <button class="confirm-btn" style="margin-top:16px;background:transparent;border:1px solid var(--line-strong);box-shadow:none" @click="restart">
-                <i class="ri-add-line"></i> Novo agendamento
+            </div>
+
+            <div class="success-actions" v-if="m.widget === 'success'">
+              <button class="success-action-btn" @click="goToBookings">
+                Meus agendamentos
               </button>
-              <div class="success-image-wrap">
-                <img src="./img/finalize.webp" alt="Agendamento confirmado" />
-              </div>
+              <button class="success-action-btn" @click="restart">
+                Novo agendamento
+              </button>
+              <button class="success-action-btn" @click="goToBookings">
+                Cancelar agendamento
+              </button>
             </div>
 
           </template>
