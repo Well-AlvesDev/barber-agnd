@@ -403,15 +403,16 @@ body {
 
 .day-divider {
     align-self: center;
-    font-size: 11.5px;
-    font-weight: 600;
+    font-size: 9px;
+    font-weight: 700;
     color: var(--text-faint);
-    background: rgba(255, 255, 255, 0.05);
-    padding: 5px 12px;
-    border-radius: 20px;
-    margin: 10px 0 16px;
-    letter-spacing: 0.3px;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin: 6px 0 8px;
+    letter-spacing: 0.12px;
     text-transform: uppercase;
+    line-height: 1;
 }
 
 .row {
@@ -1594,18 +1595,18 @@ body {
 
 .day-badge {
     flex-shrink: 0;
-    width: 104px;
-    padding: 16px 12px;
+    width: 68px;
+    padding: 8px 6px;
     background: linear-gradient(155deg, #6b6a6a, #1c1c1c);
-    border-radius: var(--radius-md);
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     cursor: pointer;
-    transition: all 0.15s var(--ease-soft);
+    transition: all 0.12s var(--ease-soft);
     opacity: 0;
-    animation: chip-in 0.38s var(--ease-spring) forwards;
+    animation: chip-in 0.28s var(--ease-spring) forwards;
     text-align: center;
     color: var(--text-dim);
 }
@@ -1644,20 +1645,20 @@ body {
 }
 
 .day-badge-dow {
-    font-size: 15px;
-    font-weight: 400;
+    font-size: 11px;
+    font-weight: 600;
     color: #fff;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
 }
 
 .day-badge-date {
     position: relative;
     display: block;
-    width: 130%;
-    padding-top: 12px;
-    font-size: 30px;
-    font-weight: 400;
+    width: 100%;
+    padding-top: 6px;
+    font-size: 18px;
+    font-weight: 600;
     color: var(--text);
     text-align: center;
 }
@@ -1673,7 +1674,7 @@ body {
 }
 
 .day-badge-month {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     color: var(--text-dim);
     text-transform: uppercase;

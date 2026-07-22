@@ -357,9 +357,44 @@
           if (stage.value !== 'datetime') return;
           booking.date = date;
           await nextTick();
-          if (!hasScrolledToSlots.value && scrollEl.value) {
-            hasScrolledToSlots.value = true;
-            scrollEl.value.scrollBy({ top: 390, behavior: 'smooth' });
+
+          // Smart scroll: bring time-slots area into view and ensure the "Enviar" button is visible.
+          try {
+            const container = scrollEl.value;
+            if (!container) return;
+
+            const slotsWrap = container.querySelector('.slots-wrap');
+            const submitWrap = container.querySelector('.datetime-submit-wrap');
+
+            if (slotsWrap) {
+              // Scroll so slots are near the top of the visible area
+              scrollElementIntoViewInContainer(container, slotsWrap, 'top');
+            }
+
+            // After the main scroll settles, ensure the submit button is visible (scroll further if needed)
+            setTimeout(() => {
+              if (!container || !submitWrap) return;
+              try {
+                const contRect = container.getBoundingClientRect();
+                const submitRect = submitWrap.getBoundingClientRect();
+                const margin = 12; // small breathing room
+
+                // If the submit button bottom is below the container bottom, scroll down enough to reveal it
+                if (submitRect.bottom > contRect.bottom - margin) {
+                  const extra = submitRect.bottom - contRect.bottom + margin;
+                  container.scrollBy({ top: Math.max(0, extra), behavior: 'smooth' });
+                }
+                // If the submit button is above the container top (rare), scroll up to it
+                else if (submitRect.top < contRect.top + margin) {
+                  const extra = submitRect.top - contRect.top - margin;
+                  container.scrollBy({ top: Math.min(0, extra), behavior: 'smooth' });
+                }
+              } catch (e) {
+                // ignore
+              }
+            }, 260);
+          } catch (err) {
+            // fail silently
           }
         }
 
@@ -379,8 +414,8 @@
             }
           };
 
-          addSlots(8, 30, 12, 0);
-          addSlots(14, 0, 19, 0);
+          addSlots(8, 0, 11, 30);
+          addSlots(14, 0, 18, 0);
 
           if (!booking.date) {
             return slots;
@@ -503,7 +538,7 @@
               <div class="glass-menu-sheen"></div>
               <button class="glass-menu-item" role="menuitem" type="button" @click="goToBookings">
                 <span class="glass-menu-icon"><i class="ri-calendar-check-line"></i></span>
-                <span class="glass-menu-label">Ver meus agendamentos</span>
+                <span class="glass-menu-label">Meus agendamentos</span>
               </button>
               <div class="glass-menu-divider"></div>
               <button class="glass-menu-item danger" role="menuitem" type="button" :disabled="starting" :aria-disabled="starting" @click="restartFromMenu">
@@ -602,7 +637,6 @@
               <div class="row-avatar-spacer"></div>
               <div class="bubble-col">
                 <div class="bubble bot success-bubble">
-                  <img src="./img/finalize.webp" alt="Confirmação de agendamento" class="success-bubble-image">
                   <div>{{ customer.name }}, seu agendamento de {{ booking.services.map(s => s.name).join(', ') }} com {{ booking.barber?.name }} foi confirmado para {{ fmtDateShort(booking.date) }} às {{ booking.time }}. ✅</div>
                   <span class="meta-time">{{ m.time }}</span>
                 </div>
